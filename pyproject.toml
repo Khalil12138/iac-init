@@ -6,8 +6,25 @@ authors = ["Wang Xiao <xiawang3@cisco.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+click = "^8.0.4"
+errorhandler = "^2.0.1"
+importlib-metadata = "^2.0.0"
+python = "^3.8"
+ruamel-yaml = ">0.16.10"
+yamale = "^4.0.3"
 
+[tool.poetry.group.dev.dependencies]
+ansible-core = "^2.13.2"
+black = "^22.10.0"
+flake8 = "^5.0.4"
+isort = "^5.10.1"
+mypy = "^0.990"
+pre-commit = "^2.20.0"
+pytest = "^7.2.0"
+pytest-cov = "^4.0.0"
+pytest-mock = "^3.10.0"
+toml = "^0.10.2"
+types-pyyaml = "^6.0.12.2"
 
 [build-system]
 requires = ["poetry-core"]
