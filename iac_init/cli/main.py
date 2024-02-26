@@ -5,12 +5,9 @@
 import logging
 import sys
 from typing import List
-
 import click
 import errorhandler
-
 import iac_init.initiator
-
 from . import options
 
 logger = logging.getLogger(__name__)
@@ -57,9 +54,26 @@ def main(
     """A CLI tool to perform APIC initialize."""
     configure_logging(verbosity)
 
+    # Get IP content in APIC IP config file and validate each ip if validate or not
     initiator = iac_init.initiator.Initiator(fabric_config)
     error = initiator._validate_ip_config()
     if error:
+        exit()
+
+    # Type "yes" or "no" to preform APIC initiator
+    option_proceed = click.prompt("Are you sure proceed init following APIC!?\n{}".format(initiator.ip_str), type=click.Choice(['yes', 'no'], case_sensitive=False))
+    if option_proceed == "yes":
+        option = click.prompt("Select singel or multiple options to init APIC:\n[1] APIC/Switch PXE boot up\n[2] Fabric discovery(Single Pod, Multi Pod, Multi Site, Remote Leaf, etc..)\n[3] Management Configuration(INB, OOB, NTP, DNS, AAA, etc..)\n[4] Fabric policy creation\n[5] Access policy creation\n[6] Fabric features(SNMP, syslog, etc..)\nExample: (1,2,..6)", type=initiator._validate_choices)
+        if not option:
+            exit()
+        option_options = click.prompt("Are you sure proceed init following Procedures!?\n{}".format(initiator.options), type=click.Choice(['yes', 'no'], case_sensitive=False))
+        if option_options== "yes":
+            error = initiator._create_threadingpool()
+            if error:
+                exit()
+        else:
+            exit()
+    else:
         exit()
 
 def exit() -> None:
