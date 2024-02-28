@@ -12,5 +12,5 @@ def check_ssh_connection(ip:str, username:str, password:str):
         client.connect(ip, username=username, password=password, timeout=5)
         client.close()
         return True
-    except (paramiko.AuthenticationException, paramiko.SSHException, socket.timeout):
+    except Exception:
         return False
