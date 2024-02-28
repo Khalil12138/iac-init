@@ -4,4 +4,6 @@
 
 import click
 
-path = click.option('--fabric-config', '-f', type=click.Path(), required=True, help='Path to fabric configuration file')
+path = click.option('--data', '-d', type=click.Path(), required=True, help='Path to data YAML files.')
+
+settings_path = click.option('--settings', '-s', type=click.Path(), required=True, help='Path to user config settings.py')

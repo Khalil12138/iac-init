@@ -2,18 +2,18 @@
 
 # Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
 
-import logging
 import sys
-from typing import List
 import click
+import logging
 import errorhandler
-import iac_init.initiator
+import iac_init.validator
+
 from . import options
+from iac_init.scripts import create_threadingpool
 
 logger = logging.getLogger(__name__)
 
 error_handler = errorhandler.ErrorHandler()
-
 
 def configure_logging(level: str) -> None:
     if level == "DEBUG":
@@ -33,7 +33,6 @@ def configure_logging(level: str) -> None:
     logger.setLevel(lev)
     error_handler.reset()
 
-
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.version_option(iac_init.__version__)
 @click.option(
@@ -47,37 +46,45 @@ def configure_logging(level: str) -> None:
 )
 
 @options.path
+@options.settings_path
 def main(
     verbosity: str,
-    fabric_config: str,
+    data: str,
+    settings: str
 ) -> None:
     """A CLI tool to perform APIC initialize."""
     configure_logging(verbosity)
 
     # Get IP content in APIC IP config file and validate each ip if validate or not
-    initiator = iac_init.initiator.Initiator(fabric_config)
-    error = initiator._validate_ip_config()
+    validator = iac_init.validator.Validator(data, settings)
+    error = validator._wrapped()
     if error:
         exit()
 
+    from iac_init.conf import settings
+
     # Type "yes" or "no" to preform APIC initiator
-    option_proceed = click.prompt("Are you sure proceed init following APIC!?\n{}".format(initiator.ip_str), type=click.Choice(['yes', 'no'], case_sensitive=False))
-    if option_proceed == "yes":
-        option = click.prompt("Select singel or multiple options to init APIC:\n[1] APIC/Switch PXE boot up\n[2] Fabric discovery(Single Pod, Multi Pod, Multi Site, Remote Leaf, etc..)\n[3] Management Configuration(INB, OOB, NTP, DNS, AAA, etc..)\n[4] Fabric policy creation\n[5] Access policy creation\n[6] Fabric features(SNMP, syslog, etc..)\nExample: (1,2,..6)", type=initiator._validate_choices)
-        if not option:
-            exit()
-        option_options = click.prompt("Are you sure proceed init following Procedures!?\n{}".format(initiator.options), type=click.Choice(['yes', 'no'], case_sensitive=False))
-        if option_options== "yes":
-            error = initiator._create_threadingpool()
-            if error:
-                exit()
-        else:
-            exit()
-    else:
+    option_proceed = click.prompt("Are you sure proceed init following APIC!?\n{}".format(",".join(settings.APIC_DEVICES)),
+                                  type=click.Choice(['yes', 'no'], case_sensitive=False))
+    validator._validate_bool(option_proceed)
+
+    # Type single number or multiple number (1,2...)
+    option_choice = click.prompt(
+        "Select single or multiple options to init APIC:\n{}\nExample: (1,2,..)".format("\n".join([f"[{i + 1}]  {option}" for i, option in enumerate(settings.DEFAULT_USER_OPTIONS)])),
+        type=validator._validate_choices)
+    if not option_choice:
         exit()
+
+    # Type "yes" or "no" to preform APIC initiator
+    option_proceed = click.prompt("Are you sure proceed init following Procedures!?\n{}".format(option_choice),
+                                  type=click.Choice(['yes', 'no'], case_sensitive=False))
+    validator._validate_bool(option_proceed)
+
+    create_threadingpool.create_threadingpool(option_choice)
 
 def exit() -> None:
     if error_handler.fired:
         sys.exit(1)
     else:
         sys.exit(0)
+

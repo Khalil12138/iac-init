@@ -15,6 +15,7 @@ importlib-metadata = "^2.0.0"
 python = "^3.8"
 ruamel-yaml = ">0.16.10"
 yamale = "^4.0.3"
+paramiko = "^3.4.0"
 
 [tool.poetry.group.dev.dependencies]
 ansible-core = "^2.13.2"
