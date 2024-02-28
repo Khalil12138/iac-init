@@ -76,7 +76,7 @@ def main(
         exit()
 
     # Type "yes" or "no" to preform APIC initiator
-    option_proceed = click.prompt("Are you sure proceed init following Procedures!?\n{}".format(option_choice),
+    option_proceed = click.prompt("Are you sure proceed init following Procedures!?\n{}".format("\n".join([f"[{i}]  {settings.DEFAULT_USER_OPTIONS[int(i)-1]}" for i in option_choice])),
                                   type=click.Choice(['yes', 'no'], case_sensitive=False))
     validator._validate_bool(option_proceed)
 
