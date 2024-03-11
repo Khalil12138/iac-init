@@ -1,0 +1,9 @@
+---
+- name: Validate APIC Data
+  hosts: apic
+  gather_facts: no
+
+  tasks:
+    - name: Validate APIC Data
+      include_role:
+        name: cisco.aac.apic_validate

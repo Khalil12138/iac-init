@@ -1,0 +1,8 @@
+---
+aci:
+  children:
+    apic:
+      hosts:
+        apic1:
+          apic_host: "{{ fabric.apic_nodes_connection[0].apic_address }}"
+          ansible_connection: local

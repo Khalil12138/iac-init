@@ -4,6 +4,4 @@
 
 import click
 
-path = click.option('--data', '-d', type=click.Path(), required=True, help='Path to data YAML files.')
-
-settings_path = click.option('--settings', '-s', type=click.Path(), required=True, help='Path to user config settings.py')
+yaml_dir_path = click.option('--data', '-d', type=click.Path(), required=True, help='Path to data YAML files.')

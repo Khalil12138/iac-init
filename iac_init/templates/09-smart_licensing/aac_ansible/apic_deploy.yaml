@@ -1,0 +1,18 @@
+---
+- name: Deploy APIC model
+  hosts: apic
+  gather_facts: no
+  vars:
+    apic_snapshot: True
+    apic_deploy: True
+
+  tasks:
+    - name: APIC Snapshot
+      include_role:
+        name: cisco.aac.apic_snapshot
+      when: apic_snapshot
+
+    - name: APIC Deploy
+      include_role:
+        name: cisco.aac.apic_deploy
+      when: apic_deploy

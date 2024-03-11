@@ -1,0 +1,13 @@
+---
+- name: APIC Tests
+  hosts: apic
+  gather_facts: no
+  vars:
+    test_apic_deploy: True
+
+  tasks:
+    - name: APIC Tests
+      include_role:
+        name: cisco.aac.test_apic_deploy
+      when: test_apic_deploy
+
