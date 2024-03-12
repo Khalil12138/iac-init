@@ -8,10 +8,9 @@ from ansible_runner import run
 from iac_init.conf import settings
 
 def run_ansible_playbook(step: str, option, inventory_path, playbook_path):
-    logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init-{}-{}.log'.format(option, step)),
-               level="DEBUG")
+    logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init-{}-{}.log'.format(option, step)))
 
-    runner = run(playbook=playbook_path, inventory=inventory_path, extravars={"verbose_level": 2})
+    runner = run(playbook=playbook_path, inventory=inventory_path, verbosity=5)
     logger.info(runner.stdout.read())
 
     if runner.status == "successful":
