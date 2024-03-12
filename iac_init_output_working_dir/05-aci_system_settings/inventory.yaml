@@ -1,0 +1,8 @@
+---
+aci:
+  children:
+    apic:
+      hosts:
+        apic1:
+          apic_host: "10.124.145.23"
+          ansible_connection: local

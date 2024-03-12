@@ -100,19 +100,21 @@ class YamlWriter:
                         self.render_template(t_path, self.o_path, env)
                         logger.info("Generate working file success: {}".format(self.o_path))
                 except Exception as e:
-                    logger.error("Generate working file success: {}".format(self.o_path))
+                    logger.error("Generate working file failed: {}".format(self.o_path))
                     logger.error("Error: {}".format(e))
                     exit()
             else:
                 try:
                     rel = os.path.relpath(dir, templates_path)
+                    print("rel", rel)
                     rel = rel.replace("\\", "/")
                     self.o_dir = self._fix_duplicate_path(
                         output_path, os.path.basename(templates_path), rel
                     )
+                    print("self.o_dir", self.o_dir)
                     pathlib.Path(self.o_dir).mkdir(parents=True, exist_ok=True)
                     logger.info("Generate working directory success: {}".format(self.o_dir))
                 except Exception as e:
-                    logger.error("Generate working directory success: {}".format(self.o_dir))
+                    logger.error("Generate working directory failed: {}".format(self.o_dir))
                     logger.error("Error: {}".format(e))
                     exit()
