@@ -16,3 +16,5 @@
       include_role:
         name: cisco.aac.apic_deploy
       when: apic_deploy
+      vars:
+        apic_option_delete: False
