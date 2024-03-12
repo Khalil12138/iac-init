@@ -1,7 +1,0 @@
----
-apic_mode: only_provided
-apic_username: "admin"
-apic_password: "Cisco123"
-apic_option_render: True
-apic_option_configure: True
-apic_option_delete: True

@@ -106,12 +106,10 @@ class YamlWriter:
             else:
                 try:
                     rel = os.path.relpath(dir, templates_path)
-                    print("rel", rel)
                     rel = rel.replace("\\", "/")
                     self.o_dir = self._fix_duplicate_path(
                         output_path, os.path.basename(templates_path), rel
                     )
-                    print("self.o_dir", self.o_dir)
                     pathlib.Path(self.o_dir).mkdir(parents=True, exist_ok=True)
                     logger.info("Generate working directory success: {}".format(self.o_dir))
                 except Exception as e:
