@@ -18,7 +18,6 @@ logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-
 def cimc_api(CIMC_IP, data):
     try:
         cimc_url = f"https://{CIMC_IP}/nuova"
