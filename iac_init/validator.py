@@ -14,6 +14,7 @@ from iac_init.conf import settings
 from iac_init.yaml_conf.yaml import load_yaml_files
 from iac_init.scripts.ssh_tool import check_ssh_connection
 from iac_init.scripts.apic_connecton_tool import apic_login
+from iac_init.scripts.cimc_precheck_tool import cimc_precheck
 from iac_init.scripts.telnet_tool import check_tennet_connection
 
 logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init-main.log'), format="{time} {level} {message}", level="INFO")
@@ -242,6 +243,28 @@ class Validator:
             logger.error(msg)
             self.errors.append(msg)
             return False
+
+    def validate_cimc_precheck(self):
+        cimc_username = self.apic_cimc_credential[0]
+        cimc_password = self.apic_cimc_credential[1]
+        result = {}
+        for cimc_ip in self.cimc_address:
+            error = cimc_precheck(cimc_ip, cimc_username, cimc_password)
+            result[cimc_ip] = error
+
+        result_state = True
+        for cimc_ip, test_result in result:
+            if test_result:
+                msg = "{} pre-check success\n".format(cimc_ip)
+                logger.info(msg)
+            else:
+                result_state = False
+                msg = "{} pre-check fail\n".format(cimc_ip)
+                logger.error(msg)
+
+        if result_state:
+            return False
+        return True
 
     def _validate_bool(self, bool):
         if bool == "yes":
