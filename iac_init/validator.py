@@ -153,7 +153,7 @@ class Validator:
         apic_fail_list = []
 
         for ip in self.cimc_address:
-            logger.info("Start SSH Connection Validate for {}, timeout 60s".format(ip))
+            logger.info("Start SSH Connection Validate for {}, timeout 5 minustes".format(ip))
             connection_state = check_ssh_connection(ip, self.apic_cimc_credential[0], self.apic_cimc_credential[1])
             if not connection_state:
                 apic_fail_list.append(ip)
