@@ -244,7 +244,6 @@ class Validator:
             logger.error(msg)
             self.errors.append(msg)
             return False
-
     def validate_cimc_precheck(self):
         cimc_username = self.apic_cimc_credential[0]
         cimc_password = self.apic_cimc_credential[1]
@@ -252,17 +251,18 @@ class Validator:
         for cimc_ip in self.cimc_address:
             error = cimc_precheck(cimc_ip, cimc_username, cimc_password)
             result[cimc_ip] = error
-
+    
         result_state = True
-        for cimc_ip, test_result in result:
-            if test_result:
-                msg = "{} pre-check success\n".format(cimc_ip)
-                logger.info(msg)
-            else:
-                result_state = False
-                msg = "{} pre-check fail\n".format(cimc_ip)
-                logger.error(msg)
-
+        for data in result:
+            for cimc_ip, test_result in data.items():
+                if test_result:
+                    msg = "{} pre-check success\n".format(cimc_ip)
+                    logger.info(msg)
+                else:
+                    result_state = False
+                    msg = "{} pre-check fail\n".format(cimc_ip)
+                    logger.error(msg)
+    
         if result_state:
             return False
         return True
