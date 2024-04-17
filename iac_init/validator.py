@@ -157,7 +157,9 @@ class Validator:
         apic_fail_list = []
 
         for ip in self.cimc_address:
-            logger.info(ip, self.apic_cimc_credential[0], self.apic_cimc_credential[1])
+            logger.info(ip)
+            logger.info(self.apic_cimc_credential[0])
+            logger.info(self.apic_cimc_credential[1])
             connection_state = check_ssh_connection(ip, self.apic_cimc_credential[0], self.apic_cimc_credential[1])
             if not connection_state:
                 apic_fail_list.append(ip)
