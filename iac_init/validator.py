@@ -142,10 +142,33 @@ class Validator:
                 logger.error(msg)
                 self.errors.append(msg)
                 return True
+            else:
+                return self._validate_image_version()
         else:
             msg = "Validate error: Pls provide APIC/Switch IP configuration"
             logger.error(msg)
             self.errors.append(msg)
+            return True
+
+    def _validate_image_version(self):
+        try:
+            image32 = settings.global_policy['fabric']['global_policies']['switch_image32']
+            image64 = settings.global_policy['fabric']['global_policies']['switch_image64']
+
+            pattern_32 = r"^(.+)\.bin"
+            pattern_64 = r'(.+)-cs_64.bin'
+
+            if not re.match(pattern_32, image32).group(1) == re.match(pattern_64, image64).group(1):
+                msg = "Validate error: switch_image32 and switch_image64 checking failed."
+                logger.error(msg)
+                return True
+
+        except Exception as e:
+            msg = "Validate error: Yaml configuration switch_image32 and switch_image64 checking failed."
+            logger.error(msg)
+            msg = e
+            logger.error(msg)
+            self.errors.append(str(msg))
             return True
 
     def validate_ssh_telnet_connection(self):
