@@ -254,6 +254,7 @@ class Validator:
     
         result_state = True
         for data in result:
+            print(234, data, result)
             for cimc_ip, test_result in data.items():
                 if test_result:
                     msg = "{} pre-check success\n".format(cimc_ip)
