@@ -7,7 +7,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-OUTPUT_BASE_DIR = os.path.join(".", "iac_init_output_working_dir")
+OUTPUT_BASE_DIR = os.path.join(BASE_DIR, "iac_init_output_working_dir")
 
 DEFAULT_USER_OPTIONS = [
     "Wipe an ACI fabric/PXE boot(APIC + Switch).",
