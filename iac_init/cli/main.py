@@ -18,6 +18,9 @@ from iac_init.scripts.ansible_tool import run_ansible_playbook
 
 error_handler = errorhandler.ErrorHandler()
 
+logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init-main.log'),
+           format="{time} {level} {message}", level="INFO")
+logger.add(logging.StreamHandler(), format="", level="INFO")
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.version_option(iac_init.__version__)
@@ -27,9 +30,6 @@ def main(
 ) -> None:
     """A CLI tool to perform APIC initialize."""
     output = settings.OUTPUT_BASE_DIR
-    logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init-main.log'),
-               format="{time} {level} {message}", level="INFO")
-    logger.add(logging.StreamHandler(), format="", level="DEBUG")
 
     validator = iac_init.validator.Validator(data, output)
 
