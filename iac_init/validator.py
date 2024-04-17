@@ -18,7 +18,6 @@ from iac_init.scripts.cimc_precheck_tool import cimc_precheck
 from iac_init.scripts.telnet_tool import check_tennet_connection
 
 logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init-main.log'), format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}', encoding='utf-8')
-logger.add(logging.StreamHandler(), format='')
 
 class Validator:
     def __init__(self, data_path: str, output: str):
@@ -45,9 +44,6 @@ class Validator:
             logger.error(msg)
             self.errors.append(msg)
             return True
-
-        if os.path.exists(self.output) and os.path.isdir(self.output):
-            shutil.rmtree(self.output)
 
         logger.info("Loaded Yaml directory: {}".format(self.data_path))
 
