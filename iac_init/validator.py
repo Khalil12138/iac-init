@@ -254,6 +254,7 @@ class Validator:
             result[cimc_ip] = error
 
         result_state = True
+        print(234,result)
         for cimc_ip, test_result in result:
             if test_result:
                 msg = "{} pre-check success\n".format(cimc_ip)
