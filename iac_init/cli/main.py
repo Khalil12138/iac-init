@@ -68,6 +68,9 @@ def main(
             error = validator.validate_cimc_precheck()
             if error:
                 exit()
+            option_yaml_path = validator.validate_yaml_exist(settings.DATA_PATH[int(option) - 1])
+            if not option_yaml_path:
+                exit()
             try:
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option) - 1], output)
@@ -91,6 +94,22 @@ def main(
                 msg = "Generate working directory fail, detail: {}".format(e)
                 logger.error(msg)
                 exit()
+
+            try:
+                playbook_dir = os.path.join(os.getcwd(), output,
+                                                    os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
+                                                    'playbook_apic_init.yaml')
+
+                deploy_result = run_ansible_playbook(settings.ANSIBLE_STEP[3], option, None,
+                                                    playbook_dir)
+                if not deploy_result:
+                    exit()
+
+
+            except Exception as e:
+                msg = "Run NAC ansible-playbook fail detail:\nError: {}".format(e)
+                logger.error(msg)
+                exit()
         elif int(option) in [2]:
             error = validator.validate_ssh_telnet_connection()
             if error:
@@ -100,6 +119,9 @@ def main(
                 exit()
             error = validator.validate_cimc_precheck()
             if error:
+                exit()
+            option_yaml_path = validator.validate_yaml_exist(settings.DATA_PATH[int(option) - 1])
+            if not option_yaml_path:
                 exit()
             try:
                 writer = yaml_writer.YamlWriter([yaml_path])

@@ -77,5 +77,7 @@ os.environ["iac_init_option_2"] = OUTPUT_DIR[1]
 ANSIBLE_STEP = [
     'iac-validate',
     'deploy',
-    'iac-test'
+    'iac-test',
+    'wipe_aci_fabric',
+    'apic_setup'
 ]

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "iac-init"
-version = "0.4.4"
+version = "0.4.5"
 description = ""
 authors = ["Wang Xiao <xiawang3@cisco.com>"]
 readme = "README.md"
@@ -20,6 +20,8 @@ requests = "^2.31.0"
 loguru = "^0.7.2"
 jmespath = "^1.0.1"
 ansible-runner = "^2.3.5"
+lxml = "^5.2.1"
+xmljson = "^0.2.1"
 
 [tool.poetry.group.dev.dependencies]
 ansible-core = "^2.13.2"
