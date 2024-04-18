@@ -78,6 +78,7 @@ ANSIBLE_STEP = [
     'iac-validate',
     'deploy',
     'iac-test',
-    'wipe_aci_fabric',
+    'wipe_apic',
+    'wipe_switch',
     'apic_setup'
 ]

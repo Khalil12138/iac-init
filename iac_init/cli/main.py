@@ -7,6 +7,7 @@ import sys
 import click
 import shutil
 import logging
+import threading
 import errorhandler
 import iac_init.validator
 
@@ -96,18 +97,29 @@ def main(
                 exit()
 
             try:
-                playbook_dir = os.path.join(os.getcwd(), output,
-                                                    os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
-                                                    'playbook_apic_init.yaml')
+                def ansible_deploy_function(playbook_name, step_name):
+                    playbook_dir = os.path.join(os.getcwd(), output,
+                                                os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
+                                                playbook_name)
 
-                deploy_result = run_ansible_playbook(settings.ANSIBLE_STEP[3], option, None,
-                                                    playbook_dir)
-                if not deploy_result:
-                    exit()
+                    deploy_result = run_ansible_playbook(step_name, option, None,
+                                                         playbook_dir)
+                    if not deploy_result:
+                        exit()
 
+                thread1 = threading.Thread(target=ansible_deploy_function, args=("playbook_apic_init.yaml", settings.ANSIBLE_STEP[3]))
+                thread2 = threading.Thread(target=ansible_deploy_function, args=("playbook_aci_switch_init.yaml", settings.ANSIBLE_STEP[4]))
+
+                logger.info("Wipe aci fabric start pls wait, check log for detail.")
+
+                thread1.start()
+                thread2.start()
+
+                thread1.join()
+                thread2.join()
 
             except Exception as e:
-                msg = "Run NAC ansible-playbook fail detail:\nError: {}".format(e)
+                msg = "Run wipe aci fabric ansible-playbook fail detail:\nError: {}".format(e)
                 logger.error(msg)
                 exit()
         elif int(option) in [2]:
