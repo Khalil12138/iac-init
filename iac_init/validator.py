@@ -158,10 +158,16 @@ class Validator:
             pattern_32 = r"^(.+)\.bin"
             pattern_64 = r'(.+)-cs_64.bin'
 
-            if not re.match(pattern_32, image32).group(1) == re.match(pattern_64, image64).group(1):
-                msg = "Validate error: switch_image32 and switch_image64 checking failed."
-                logger.error(msg)
-                return True
+            if image32 == image64:
+                if not image32.endwith(".bin"):
+                    msg = "Validate error: Image name must end with .bin."
+                    logger.error(msg)
+                    return True
+            else:
+                if not re.match(pattern_32, image32).group(1) == re.match(pattern_64, image64).group(1):
+                    msg = "Validate error: switch_image32 and switch_image64 checking failed."
+                    logger.error(msg)
+                    return True
 
         except Exception as e:
             msg = "Validate error: Yaml configuration switch_image32 and switch_image64 checking failed."
