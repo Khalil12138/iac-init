@@ -58,7 +58,40 @@ def main(
 
     for option in option_choice:
         logger.info("Start proceeding step {}.".format(option))
-        if int(option) in [1, 2]:
+        if int(option) in [1]:
+            error = validator.validate_ssh_telnet_connection()
+            if error:
+                exit()
+            yaml_path = validator.validate_yaml_exist(settings.DEFAULT_DATA_PATH)
+            if not yaml_path:
+                exit()
+            error = validator.validate_cimc_precheck()
+            if error:
+                exit()
+            try:
+                writer = yaml_writer.YamlWriter([yaml_path])
+                writer.write(settings.TEMPLATE_DIR[int(option) - 1], output)
+                logger.info("Generate Step {} working directory forder in {} Success!!".format(option, output))
+
+                dir_path = os.path.join(output, os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
+                                        'aci_switch_reimage', 'vars')
+                if os.path.exists(dir_path) and os.path.isdir(dir_path):
+                    yaml_cp_output_path = os.path.join(dir_path, 'main.yml')
+                    shutil.copy(option_yaml_path, yaml_cp_output_path)
+                    logger.info("Copied Yaml file to {} success.".format(yaml_cp_output_path))
+
+                dir_path = os.path.join(output, os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
+                                        'apic_reimage', 'vars')
+                if os.path.exists(dir_path) and os.path.isdir(dir_path):
+                    yaml_cp_output_path = os.path.join(dir_path, 'main.yml')
+                    shutil.copy(option_yaml_path, yaml_cp_output_path)
+                    logger.info("Copied Yaml file to {} success.".format(yaml_cp_output_path))
+
+            except Exception as e:
+                msg = "Generate working directory fail, detail: {}".format(e)
+                logger.error(msg)
+                exit()
+        elif int(option) in [2]:
             error = validator.validate_ssh_telnet_connection()
             if error:
                 exit()

@@ -1,0 +1,11 @@
+---
+
+# Playbook to discover APIC
+- name: discover APIC
+  hosts: localhost
+  gather_facts: False
+
+  tasks:
+    - name: discover APIC
+      include_role:
+        name: apic_discovery

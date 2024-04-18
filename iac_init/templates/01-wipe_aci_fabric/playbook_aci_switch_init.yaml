@@ -1,0 +1,11 @@
+---
+
+# Playbook to install ACI switch
+- name: Init ACI Switch
+  hosts: localhost
+  gather_facts: False
+
+  tasks:
+    - name: Reimage ACI Switch
+      include_role:
+        name: aci_switch_reimage

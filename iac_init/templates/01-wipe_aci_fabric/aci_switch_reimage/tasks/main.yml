@@ -1,0 +1,43 @@
+---
+
+# Copyright: (c) 2022, Rudy Lei <shlei@cisco.com>
+
+- name: ACI switch Reimage Tasks
+  block:
+    - name: Render ACI switch reimage script
+      template:
+        src: aci_switch_reimage.exp.jinja2
+        dest: "{{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/aci_switch_reimage_{{ item.hostname }}.exp"
+      delegate_to: localhost
+      loop: "{{ fabric.switch_nodes_connection }}"
+
+    - name: Make ACI switch reimage script executable
+      file:
+        path: "{{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/aci_switch_reimage_{{ item.hostname }}.exp"
+        mode: "+x"
+      delegate_to: localhost
+      loop: "{{ fabric.switch_nodes_connection }}"
+
+    - name: Execute ACI switch reimage script
+      command: "/usr/bin/expect {{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/aci_switch_reimage_{{ item.hostname }}.exp"
+      delegate_to: localhost
+      loop: "{{ fabric.switch_nodes_connection }}"
+
+    - name: Render ACI switch reimage post check script
+      template:
+        src: aci_switch_reimage_post_check.exp.jinja2
+        dest: "{{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/aci_switch_reimage_post_check_{{ item.hostname }}.exp"
+      delegate_to: localhost
+      loop: "{{ fabric.switch_nodes_connection }}"
+
+    - name: Make ACI switch reimage post check script executable
+      file:
+        path: "{{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/aci_switch_reimage_post_check_{{ item.hostname }}.exp"
+        mode: "+x"
+      delegate_to: localhost
+      loop: "{{ fabric.switch_nodes_connection }}"
+
+    - name: Execute ACI switch reimage post check script
+      command: "/usr/bin/expect {{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/aci_switch_reimage_post_check_{{ item.hostname }}.exp"
+      delegate_to: localhost
+      loop: "{{ fabric.switch_nodes_connection }}"

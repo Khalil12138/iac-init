@@ -1,0 +1,41 @@
+#!/usr/bin/expect -f
+
+# Copyright: (c) 2022, Rudy Lei <shlei@cisco.com>
+
+# Configuration
+set send_human {.1 .3 1 .05 2}
+set username "{{ fabric.global_policies.apic_cimc_username }}"
+set password "{{ fabric.global_policies.apic_cimc_password }}"
+set host "{{ item.cimc_address }}"
+
+set timeout 3600
+
+# Human-like send procedure
+proc send_human {cmd} {
+    global send_human
+    send -- $cmd
+    sleep 1
+}
+
+# Start SSH session
+spawn ssh -oStrictHostKeyChecking=no $username@$host
+
+# Interaction sequence
+expect {
+    " password:" { send_human "$password\n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "# " { send_human "connect host\n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "Press any key to continue..." {
+        puts "APIC reimage successfully！"
+        exit 0
+    }
+}
+
+# End of script

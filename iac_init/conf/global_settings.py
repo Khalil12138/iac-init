@@ -56,6 +56,24 @@ TEMPLATE_DIR = [
     os.path.join(BASE_DIR, "templates", "12-config_backup")
 ]
 
+OUTPUT_DIR = [
+    os.path.join(OUTPUT_BASE_DIR, "01-wipe_aci_fabric"),
+    os.path.join(OUTPUT_BASE_DIR, "02-discover_apic"),
+    os.path.join(OUTPUT_BASE_DIR, "03-node_registration"),
+    os.path.join(OUTPUT_BASE_DIR, "04-oob_mgmt"),
+    os.path.join(OUTPUT_BASE_DIR, "05-aci_system_settings"),
+    os.path.join(OUTPUT_BASE_DIR, "06-fabric_policy"),
+    os.path.join(OUTPUT_BASE_DIR, "07-access_policy"),
+    os.path.join(OUTPUT_BASE_DIR, "08-inb_mgmt"),
+    os.path.join(OUTPUT_BASE_DIR, "09-smart_licensing"),
+    os.path.join(OUTPUT_BASE_DIR, "10-confg_aaa"),
+    os.path.join(OUTPUT_BASE_DIR, "11-config_monitor"),
+    os.path.join(OUTPUT_BASE_DIR, "12-config_backup")
+]
+
+os.environ["iac_init_option_1"] = OUTPUT_DIR[0]
+os.environ["iac_init_option_2"] = OUTPUT_DIR[1]
+
 ANSIBLE_STEP = [
     'iac-validate',
     'deploy',

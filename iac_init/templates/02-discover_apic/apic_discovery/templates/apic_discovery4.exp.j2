@@ -1,0 +1,146 @@
+#!/usr/bin/expect -f
+
+# Copyright: (c) 2022, Song Wang <songwa@cisco.com>
+
+# Configuration
+set send_human {.1 .3 1 .05 2}
+set username "{{ fabric.global_policies.apic_cimc_username }}"
+set password "{{ fabric.global_policies.apic_cimc_password }}"
+set host "{{ item.cimc_address }}"
+
+set apic_fabric_name "{{ fabric.global_policies.fabric_name }}"
+set apic_fabric_id "{{ fabric.global_policies.fabric_id }}"
+set fabric_active_controllers "{{ fabric.global_policies.fabric_active_controllers }}"
+set apic_pod_id "{{ item.pod }}"
+set apic_controller_id "{{ item.id }}"
+set apic_hostname "{{ item.hostname }}"
+set apic_tep_address_pool "{{ fabric.global_policies.tep_pool }}"
+set apic_infra_vlan_id "{{ fabric.global_policies.infra_vlan }}"
+set apic_bd_multicast_address "{{ fabric.global_policies.gipo }}"
+set apic_ipv4_oob "{{ item.apic_address}}/{{ fabric.global_policies.apic_netmask }}"
+set apic_gateway  "{{ fabric.global_policies.apic_gateway }}"
+set apic_password "{{ fabric.global_policies.aci_local_password }}"
+set timeout 3600
+
+# Human-like send procedure
+proc send_human {cmd} {
+    global send_human
+    send -- $cmd
+    sleep 1
+}
+
+# Start SSH session
+spawn ssh -oStrictHostKeyChecking=no $username@$host
+
+
+# Interaction sequence
+expect {
+    " password:" { send_human "$password\n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "# " { send_human "connect host\n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "Press any key to continue..." { send_human "\n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "Enter the fabric name" { send_human "$apic_fabric_name\n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "Enter the fabric ID" {
+            send_human "$apic_fabric_id\n"
+            exp_continue
+    }
+    "Enter the number of active controllers in the fabric" {
+            send_human "$fabric_active_controllers\n"
+    }
+    timeout { exit 3 }
+}
+
+expect {
+    "Enter the POD ID" { send_human "$apic_pod_id\n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "Is this a standby controller" {
+        send_human "NO\n"
+        exp_continue
+    }
+    "Enter the controller ID" {
+        send_human "$apic_controller_id\n"
+        exp_continue
+    }
+    "Enter the controller name" {
+        send_human "$apic_hostname\n"
+    }
+    timeout { exit 3 }
+}
+
+expect {
+    "Enter address pool for TEP addresses" { send_human "$apic_tep_address_pool \n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "Enter the VLAN ID for infra network" { send_human "$apic_infra_vlan_id \n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "Enter address pool for BD multicast addresses" {
+        send_human "$apic_bd_multicast_address \n"
+        exp_continue
+    }
+    "Enable IPv6 for Out of Band Mgmt" {
+        send_human "N\n"
+        exp_continue
+    }
+    "Enter the IP*address" {
+        send_human "$apic_ipv4_oob \n"
+    }
+    timeout { exit 3 }
+}
+
+expect {
+    "Enter the IPv4 address of the default gateway" { send_human "$apic_gateway \n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "Enter the interface speed" { send_human "\n" }
+    timeout { exit 3 }
+}
+
+expect {
+    "Enable strong passwords" {
+        send_human "N\n"
+        exp_continue
+    }
+    "Enter the password for admin" {
+        send_human "$apic_password \n"
+        exp_continue
+    }
+    "Reenter the password for admin" {
+        send_human "$apic_password \n"
+        exp_continue
+    }
+    "Would you like to edit the configuration?" {
+        send_human "n\n"
+    }
+    timeout { exit 3 }
+}
+
+expect {
+    "bootstrap:reboot_setup Setup done during reboot"
+    exit 0
+    timeout { exit 3 }
+}

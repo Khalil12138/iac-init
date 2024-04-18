@@ -1,0 +1,11 @@
+---
+
+# Playbook to install APIC via CIMC-mapped vDVD
+- name: Init APIC
+  hosts: localhost
+  gather_facts: False
+
+  tasks:
+    - name: Reimage APIC
+      include_role:
+        name: apic_reimage

@@ -1,0 +1,126 @@
+---
+
+# Copyright: (c) 2022, Rudy Lei <shlei@cisco.com>
+
+- name: APIC Reimage Tasks
+  block:
+    - name: Determine target APIC major version
+      ansible.builtin.shell:
+        cmd: echo {{ fabric.global_policies.apic_image }} | awk -F '.' '{print $2}'
+      register: apic_version
+
+    - name: Update CIMC configurations and reboot APIC
+      community.general.imc_rest:
+        hostname: "{{ item.cimc_address }}"
+        username: "{{ fabric.global_policies.apic_cimc_username }}"
+        password: "{{ fabric.global_policies.apic_cimc_password }}"
+        validate_certs: false
+        timeout: 500
+        content: |
+          <!-- Configure hostname -->
+          <configConfMo><inConfig>
+            <mgmtIf dn="sys/rack-unit-1/mgmt/if-1" hostname="{{ item.hostname }}"/>
+          </inConfig></configConfMo>
+
+          <!-- Configure description -->
+          <configConfMo><inConfig>
+            <computeRackUnit dn="sys/rack-unit-1" usrLbl="{{ item.description }}"/>
+          </inConfig></configConfMo>
+
+          <!-- Configure timeZone -->
+          <configConfMo><inConfig>
+            <topSystem dn="sys" timeZone="{{ fabric.global_policies.timezone }}"/>
+          </inConfig></configConfMo>
+
+          <!-- Configure NTP -->
+          <configConfMo><inConfig>
+            <commNtpProvider dn="sys/svc-ext/ntp-svc" ntpServer1="{{ fabric.global_policies.ntp_server }}"/>
+          </inConfig></configConfMo>
+
+          <!-- Configure SOL -->
+
+          <!-- Configure CIMC mapping -->
+          <configConfMo><inConfig>
+            <commVMediaMap volumeName="aci-automation" map="www" remoteShare="{{ fabric.global_policies.aci_image_path }}" remoteFile="{{ fabric.global_policies.apic_image }}" dn="sys/svc-ext/vmedia-svc/vmmap-aci-automation" ></commVMediaMap>
+          </inConfig></configConfMo>
+
+          <!-- IMC change boot order to CIMC-map -->
+          <configConfMo><inConfig>
+            <lsbootVMedia dn="sys/rack-unit-1/boot-precision/vm-cimc-map" name="cimc-map" type="VMEDIA" subtype="cimc-mapped-dvd"  order="1" state="Enabled" />
+          </inConfig></configConfMo>
+
+          <!-- CIMC hard reset -->
+          <configConfMo><inConfig>
+            <computeRackUnit dn="sys/rack-unit-1" adminPower="hard-reset-immediate" />
+          </inConfig></configConfMo>
+
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"
+
+    - name: Render APIC HTTP speed up script
+      template:
+        src: apic_reimage{{ apic_version.stdout }}.exp.jinja2
+        dest: "{{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/apic_reimage_{{ item.hostname }}.exp"
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"
+
+    - name: Make APIC HTTP speed up script executable
+      file:
+        path: "{{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/apic_reimage_{{ item.hostname }}.exp"
+        mode: "+x"
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"
+
+    - name: Execute APIC HTTP speed up script
+      command: "/usr/bin/expect {{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/apic_reimage_{{ item.hostname }}.exp"
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"
+
+    - name: CIMC post installation and power-on APIC
+      community.general.imc_rest:
+        hostname: "{{ item.cimc_address }}"
+        username: "{{ fabric.global_policies.apic_cimc_username }}"
+        password: "{{ fabric.global_policies.apic_cimc_password }}"
+        validate_certs: false
+        timeout: 500
+        content: |
+          <!-- Delete existing CIMC mapping -->
+          <configConfMo><inConfig>
+            <lsbootVMedia dn="sys/rack-unit-1/boot-precision/vm-cimc-map" name="cimc-map" status='removed'/>
+          </inConfig></configConfMo>
+
+          <!-- Delete existsing CIMC mapping vmedia -->
+          <configConfMo><inConfig>
+            <commVMediaMap dn="sys/svc-ext/vmedia-svc/vmmap-aci-automation" volumeName="aci-automation" status='removed' ></commVMediaMap>
+          </inConfig></configConfMo>
+
+          <!-- Reconfigure IMC to boot from HDD storage -->
+          <configConfMo><inConfig>
+            <lsbootStorage dn="sys/rack-unit-1/boot-policy/storage-read-write" access="read-write" order="1" type="storage"/>
+          </inConfig></configConfMo>
+
+          <!-- CIMC power up -->
+          <configConfMo><inConfig>
+            <computeRackUnit dn="sys/rack-unit-1" adminPower="up" />
+          </inConfig></configConfMo>
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"
+
+    - name: Render APIC reimage post check script
+      template:
+        src: apic_reimage_post_check.exp.jinja2
+        dest: "{{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/apic_reimage_post_check_{{ item.hostname }}.exp"
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"
+
+    - name: Make APIC reimage post check script executable
+      file:
+        path: "{{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/apic_reimage_post_check_{{ item.hostname }}.exp"
+        mode: "+x"
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"
+
+    - name: Execute APIC reimage post check script
+      command: "/usr/bin/expect {{ lookup('ansible.builtin.env', 'iac_init_option_1') }}/apic_reimage_post_check_{{ item.hostname }}.exp"
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"

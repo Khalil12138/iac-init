@@ -1,0 +1,31 @@
+---
+
+# Copyright: (c) 2022, Rudy Lei <shlei@cisco.com>
+
+- name: APIC Discovery Tasks
+  block:
+    - name: Determine target APIC major version
+      ansible.builtin.shell:
+        cmd: echo {{ fabric.global_policies.apic_image }} | awk -F '.' '{print $2}'
+      register: apic_version
+
+    ## TBD step: Reboot APIC
+
+    - name: Render APIC discovery script
+      template:
+        src: apic_discovery{{ apic_version.stdout }}.exp.j2
+        dest: apic_discovery/files/apic_discovery_{{ item.hostname }}.exp
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"
+
+    - name: Make APIC discovery script executable
+      file:
+        path: apic_discovery/files/apic_discovery_{{ item.hostname }}.exp
+        mode: "+x"
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"
+
+    - name: Execute APIC discovery script
+      command: ./apic_discovery/files/apic_discovery_{{ item.hostname }}.exp
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"

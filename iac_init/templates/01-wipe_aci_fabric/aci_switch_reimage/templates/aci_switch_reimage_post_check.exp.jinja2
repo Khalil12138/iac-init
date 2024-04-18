@@ -1,0 +1,76 @@
+#!/usr/bin/expect -f
+
+# Copyright: (c) 2022, Rudy Lei <shlei@cisco.com>
+
+# Common Setup
+set send_human {.1 .3 1 .05 2}
+set timeout 600
+set username {{ fabric.global_policies.aci_local_username }}
+set password {{ fabric.global_policies.aci_local_password }}
+
+set switch_image {
+    {{ fabric.global_policies.switch_image32 }}
+    {{ fabric.global_policies.switch_image64 }}
+}
+
+set validator false
+
+set ip {{ item.console_address }}
+set port {{ item.console_port }}
+puts "============================================================"
+puts "connecting to $ip:$port ..."
+
+spawn telnet $ip $port
+
+sleep 2
+send -h -- "\n"
+
+expect {
+    "# " {
+    }
+    -re "--More--" {
+        send -h -- "q\r"
+        exp_continue
+    }
+    "login: " {
+        send -h -- "$username\n"
+        sleep 1
+        exp_continue
+    }
+    "Password:" {
+        send -h -- "$password\n"
+        exp_continue
+    }
+    "password:" {
+        send -h -- "$password\n"
+        exp_continue
+    }
+}
+
+# Retrieve current switch version
+send "show version | grep 'kickstart'\n"
+expect "# "
+set output $expect_out(buffer)
+
+foreach image $switch_image {
+    if {[string match "*$image*" $output]} {
+        puts "ACI switch installation complete!"
+        set validator true
+    }
+}
+
+send "bash\n"
+expect "#"
+
+send "\035"
+expect "telnet>"
+
+send "quit\r"
+expect eof
+
+puts "Telnet session complete!"
+
+if {[string match "false" $validator]} {
+    puts "ACI switch is not in target version!!"
+    exit 1
+}
