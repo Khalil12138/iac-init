@@ -159,7 +159,7 @@ class Validator:
             pattern_64 = r'(.+)-cs_64.bin'
 
             if image32 == image64:
-                if not image32.endwith(".bin"):
+                if not image32.endswith(".bin"):
                     msg = "Validate error: Image name must end with .bin."
                     logger.error(msg)
                     return True
