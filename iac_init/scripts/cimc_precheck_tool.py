@@ -158,6 +158,27 @@ def cimc_mapping_clean(CIMC_IP, token):
         logger.error(msg)
         return False
 
+def power_down_cimc(CIMC_IP, token):
+    try:
+        cimc_power_down_data = f'''
+        <!-- CIMC Power Off -->
+        <configConfMo cookie="{token}"><inConfig>
+            <computeRackUnit dn="sys/rack-unit-1" adminPower="down" />
+        </inConfig></configConfMo>
+        '''
+        cimc_power_down_response = cimc_api(CIMC_IP, cimc_power_down_data)
+        if cimc_power_down_response:
+            logger.info("CIMC is powered down.")
+        else:
+            return False
+
+        return True
+
+    except Exception as e:
+        msg = "{}".format(e)
+        logger.error(msg)
+        return False
+
 def cimc_precheck(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
     try:
         token = cimc_login(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD)
@@ -174,7 +195,10 @@ def cimc_precheck(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
             return False
 
         logger.info("CIMC mapping clean successfully!")
+        logger.info("Powering down CIMC...")
+        power_down_cimc(CIMC_IP, token)
         cimc_logout(CIMC_IP, token)
+        
         return True
 
     except Exception as e:

@@ -38,6 +38,9 @@
           </inConfig></configConfMo>
 
           <!-- Configure SOL -->
+          <configConfMo><inConfig>
+            <solIf dn="sys/rack-unit-1/sol-if" adminState="enable" speed="115200" comport="com0" sshPort="2400"/>
+          </inConfig></configConfMo>
 
           <!-- Configure CIMC mapping -->
           <configConfMo><inConfig>
@@ -49,9 +52,9 @@
             <lsbootVMedia dn="sys/rack-unit-1/boot-precision/vm-cimc-map" name="cimc-map" type="VMEDIA" subtype="cimc-mapped-dvd"  order="1" state="Enabled" />
           </inConfig></configConfMo>
 
-          <!-- CIMC hard reset -->
+          <!-- CIMC power up -->
           <configConfMo><inConfig>
-            <computeRackUnit dn="sys/rack-unit-1" adminPower="hard-reset-immediate" />
+            <computeRackUnit dn="sys/rack-unit-1" adminPower="up" />
           </inConfig></configConfMo>
 
       delegate_to: localhost

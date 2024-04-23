@@ -13,7 +13,7 @@
 
     - name: Render APIC discovery script
       template:
-        src: apic_discovery{{ apic_version.stdout }}.exp.j2
+        src: apic_discovery{{ apic_version.stdout }}.exp.jinja2
         dest: apic_discovery/files/apic_discovery_{{ item.hostname }}.exp
       delegate_to: localhost
       loop: "{{ fabric.apic_nodes_connection }}"
