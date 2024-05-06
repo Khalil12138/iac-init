@@ -100,7 +100,6 @@ def main(
                 exit()
 
             try:
-
                 def ansible_deploy_function(playbook_name, step_name):
                     import logging
                     from logging.handlers import TimedRotatingFileHandler
@@ -149,13 +148,18 @@ def main(
 
                 global ansible_run_result
                 if ansible_run_result == 0:
-                    exit()
+                    logger.error("Exist iac-init tool Step 1 failed pls check log for detail")
+                else:
+                    logger.info("Wipe aci fabric Success proceed.")
 
             except Exception as e:
-                msg = "Run wipe aci fabric ansible-playbook fail detail:\nError: {}".format(e)
+                msg = "Run Step 1 wipe aci fabric ansible-playbook failed detail:\nError: {}".format(e)
                 logger.error(msg)
                 exit()
+
         elif int(option) in [2]:
+            global ansible_run_result
+            ansible_run_result = 1
             error = validator.validate_ssh_telnet_connection()
             if error:
                 exit()
@@ -172,10 +176,66 @@ def main(
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option) - 1], output)
                 logger.info("Generate Step {} working directory forder in {} Success!!".format(option, output))
+
+                dir_path = os.path.join(output, os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
+                                        'apic_discovery', 'vars')
+                if os.path.exists(dir_path) and os.path.isdir(dir_path):
+                    yaml_cp_output_path = os.path.join(dir_path, 'main.yml')
+                    shutil.copy(option_yaml_path, yaml_cp_output_path)
+                    logger.info("Copied Yaml file to {} success.".format(yaml_cp_output_path))
+
             except Exception as e:
                 msg = "Generate working directory fail, detail: {}".format(e)
                 logger.error(msg)
                 exit()
+
+            try:
+                def ansible_deploy_function(playbook_name, step_name):
+                    import logging
+                    from logging.handlers import TimedRotatingFileHandler
+
+                    playbook_dir = os.path.join(os.getcwd(), output,
+                                                os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
+                                                playbook_name)
+
+                    logger = logging.getLogger(playbook_dir)
+                    logger.setLevel(logging.INFO)
+                    log_formatter = logging.Formatter('%(message)s')
+                    log_file = os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log',
+                                                 'iac-init-{}-{}.log'.format(option, step_name))
+                    file_handler = TimedRotatingFileHandler(log_file, when="M", interval=30, backupCount=0)
+                    file_handler.setFormatter(log_formatter)
+                    logger.addHandler(file_handler)
+
+                    def callback(res):
+                        output = re.compile(r'\x1b\[\[?(?:\d{1,2}(?:;\d{0,2})*)?[m|K]').sub('', res['stdout'])
+                        logger.info(output)
+
+                    runner = run(playbook=playbook_dir, inventory=None, verbosity=5,
+                                 quiet=True, event_handler=callback)
+
+                    if runner.status == "successful":
+                        logger.info("Successfully finish Step {}: {}".format(option, step_name.upper()))
+
+                    else:
+                        logger.error("Failed run Step {}: {}".format(option, step_name.upper()))
+                        global ansible_run_result
+                        ansible_run_result = 0
+
+                ansible_deploy_function("playbook_apic_discovery.yaml", settings.ANSIBLE_STEP[5])
+
+            except Exception as e:
+                msg = "Run Step 2 APIC discovery ansible-playbook fail detail:\nError: {}".format(e)
+                logger.error(msg)
+                exit()
+
+            global ansible_run_result
+            if ansible_run_result == 0:
+                logger.error("Exist iac-init tool Step 1 failed pls check log for detail")
+                exit()
+            else:
+                logger.info("Wipe aci fabric Success proceed.")
+
         else:
             error = validator.validate_apic_aaa_connection()
             if error:
