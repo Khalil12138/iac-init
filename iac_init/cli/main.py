@@ -3,6 +3,7 @@
 # Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
 
 import os
+import re
 import sys
 import click
 import shutil
@@ -13,11 +14,13 @@ import iac_init.validator
 
 from . import options
 from loguru import logger
+from ansible_runner import run
 from iac_init.conf import settings
 from iac_init.yaml_conf import yaml_writer
 from iac_init.scripts.ansible_tool import run_ansible_playbook
 
 error_handler = errorhandler.ErrorHandler()
+ansible_run_result = 1
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.version_option(iac_init.__version__)
@@ -95,23 +98,43 @@ def main(
                 msg = "Generate working directory fail, detail: {}".format(e)
                 logger.error(msg)
                 exit()
-
+            
             try:
                 log_lock = threading.Lock()
-                
+
                 def ansible_deploy_function(playbook_name, step_name):
                     with log_lock:
                         playbook_dir = os.path.join(os.getcwd(), output,
                                                     os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
                                                     playbook_name)
-    
-                        deploy_result = run_ansible_playbook(step_name, option, None,
-                                                             playbook_dir)
-                        if not deploy_result:
+
+                        logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log',
+                                                     'iac-init-{}-{}.log'.format(option, step_name)),
+                                   enqueue=True, format="{message}")
+
+                        def callback(res):
+                            output = re.compile(r'\x1b\[\[?(?:\d{1,2}(?:;\d{0,2})*)?[m|K]').sub('', res['stdout'])
+                            logger.info(output)
+
+                        runner = run(playbook=playbook_dir, inventory=None, verbosity=5,
+                                     stdout_callback="debug", quiet=True,
+                                     event_handler=callback)
+
+                        if runner.status == "successful":
+                            logger.info("Successfully finish Step {}: {}".format(option, step_name.upper()))
+                            logger.remove()
+
+                        else:
+                            logger.error("Failed run Step {}: {}".format(option, step_name.upper()))
+                            global ansible_run_result
+                            ansible_run_result = 0
+                            logger.remove()
                             exit()
 
-                thread1 = threading.Thread(target=ansible_deploy_function, args=("playbook_apic_init.yaml", settings.ANSIBLE_STEP[3]))
-                thread2 = threading.Thread(target=ansible_deploy_function, args=("playbook_aci_switch_init.yaml", settings.ANSIBLE_STEP[4]))
+                thread1 = threading.Thread(target=ansible_deploy_function,
+                                           args=("playbook_apic_init.yaml", settings.ANSIBLE_STEP[3]))
+                thread2 = threading.Thread(target=ansible_deploy_function,
+                                           args=("playbook_aci_switch_init.yaml", settings.ANSIBLE_STEP[4]))
 
                 logger.info("Wipe aci fabric start pls wait, check log for detail.")
 
@@ -120,6 +143,10 @@ def main(
 
                 thread1.join()
                 thread2.join()
+                
+                global ansible_run_result
+                if ansible_run_result == 0:
+                    exit()
 
             except Exception as e:
                 msg = "Run wipe aci fabric ansible-playbook fail detail:\nError: {}".format(e)
@@ -176,11 +203,11 @@ def main(
                                               os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
                                               'inventory.yaml')
                 playbook_dir = os.path.join(os.getcwd(), output,
-                                                    os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
-                                                    'aac_ansible')
+                                            os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
+                                            'aac_ansible')
 
                 validate_result = run_ansible_playbook(settings.ANSIBLE_STEP[0], option, inventory_path,
-                                                    os.path.join(playbook_dir, "apic_validate.yaml"))
+                                                       os.path.join(playbook_dir, "apic_validate.yaml"))
                 if not validate_result:
                     exit()
 
@@ -190,7 +217,7 @@ def main(
                     exit()
 
                 test_result = run_ansible_playbook(settings.ANSIBLE_STEP[2], option, inventory_path,
-                                                     os.path.join(playbook_dir, "apic_test.yaml"))
+                                                   os.path.join(playbook_dir, "apic_test.yaml"))
                 if not test_result:
                     exit()
 
