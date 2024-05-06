@@ -97,15 +97,18 @@ def main(
                 exit()
 
             try:
+                log_lock = threading.Lock()
+                
                 def ansible_deploy_function(playbook_name, step_name):
-                    playbook_dir = os.path.join(os.getcwd(), output,
-                                                os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
-                                                playbook_name)
-
-                    deploy_result = run_ansible_playbook(step_name, option, None,
-                                                         playbook_dir)
-                    if not deploy_result:
-                        exit()
+                    with log_lock:
+                        playbook_dir = os.path.join(os.getcwd(), output,
+                                                    os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
+                                                    playbook_name)
+    
+                        deploy_result = run_ansible_playbook(step_name, option, None,
+                                                             playbook_dir)
+                        if not deploy_result:
+                            exit()
 
                 thread1 = threading.Thread(target=ansible_deploy_function, args=("playbook_apic_init.yaml", settings.ANSIBLE_STEP[3]))
                 thread2 = threading.Thread(target=ansible_deploy_function, args=("playbook_aci_switch_init.yaml", settings.ANSIBLE_STEP[4]))
