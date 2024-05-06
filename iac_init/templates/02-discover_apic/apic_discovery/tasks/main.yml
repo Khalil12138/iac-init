@@ -10,6 +10,18 @@
       register: apic_version
 
     ## TBD step: Reboot APIC
+    - name: Reboot APIC
+      community.general.imc_rest:
+        hostname: "{{ item.cimc_address }}"
+        username: "{{ fabric.global_policies.apic_cimc_username }}"
+        password: "{{ fabric.global_policies.apic_cimc_password }}"
+        validate_certs: false
+        timeout: 500
+        content: |
+          <!-- CIMC hard reset -->
+          <configConfMo><inConfig>
+            <computeRackUnit dn="sys/rack-unit-1" adminPower="hard-reset-immediate" />
+          </inConfig></configConfMo>
 
     - name: Render APIC discovery script
       template:
