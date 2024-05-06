@@ -9,7 +9,6 @@
         cmd: echo {{ fabric.global_policies.apic_image }} | awk -F '.' '{print $2}'
       register: apic_version
 
-    ## TBD step: Reboot APIC
     - name: Reboot APIC
       community.general.imc_rest:
         hostname: "{{ item.cimc_address }}"
