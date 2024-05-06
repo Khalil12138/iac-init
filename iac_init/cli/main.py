@@ -98,38 +98,41 @@ def main(
                 msg = "Generate working directory fail, detail: {}".format(e)
                 logger.error(msg)
                 exit()
-            
+
             try:
-                log_lock = threading.Lock()
 
                 def ansible_deploy_function(playbook_name, step_name):
-                    with log_lock:
-                        playbook_dir = os.path.join(os.getcwd(), output,
-                                                    os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
-                                                    playbook_name)
+                    import logging
+                    from logging.handlers import TimedRotatingFileHandler
 
-                        logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log',
-                                                     'iac-init-{}-{}.log'.format(option, step_name)),
-                                   enqueue=True, format="{message}")
+                    playbook_dir = os.path.join(os.getcwd(), output,
+                                                os.path.basename(settings.TEMPLATE_DIR[int(option) - 1]),
+                                                playbook_name)
 
-                        def callback(res):
-                            output = re.compile(r'\x1b\[\[?(?:\d{1,2}(?:;\d{0,2})*)?[m|K]').sub('', res['stdout'])
-                            logger.info(output)
+                    logger = logging.getLogger(playbook_dir)
+                    logger.setLevel(logging.INFO)
+                    log_formatter = logging.Formatter('%(message)s')
+                    log_file = os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log',
+                                                 'iac-init-{}-{}.log'.format(option, step_name))
+                    file_handler = TimedRotatingFileHandler(log_file, when="M", interval=30, backupCount=0)
+                    file_handler.setFormatter(log_formatter)
+                    logger.addHandler(file_handler)
 
-                        runner = run(playbook=playbook_dir, inventory=None, verbosity=5,
-                                     stdout_callback="debug", quiet=True,
-                                     event_handler=callback)
+                    def callback(res):
+                        output = re.compile(r'\x1b\[\[?(?:\d{1,2}(?:;\d{0,2})*)?[m|K]').sub('', res['stdout'])
+                        logger.info(output)
 
-                        if runner.status == "successful":
-                            logger.info("Successfully finish Step {}: {}".format(option, step_name.upper()))
-                            logger.remove()
+                    runner = run(playbook=playbook_dir, inventory=None, verbosity=5,
+                                 quiet=True, event_handler=callback)
 
-                        else:
-                            logger.error("Failed run Step {}: {}".format(option, step_name.upper()))
-                            global ansible_run_result
-                            ansible_run_result = 0
-                            logger.remove()
-                            exit()
+                    if runner.status == "successful":
+                        logger.info("Successfully finish Step {}: {}".format(option, step_name.upper()))
+
+                    else:
+                        logger.error("Failed run Step {}: {}".format(option, step_name.upper()))
+                        global ansible_run_result
+                        ansible_run_result = 0
+                        exit()
 
                 thread1 = threading.Thread(target=ansible_deploy_function,
                                            args=("playbook_apic_init.yaml", settings.ANSIBLE_STEP[3]))
@@ -143,7 +146,7 @@ def main(
 
                 thread1.join()
                 thread2.join()
-                
+
                 global ansible_run_result
                 if ansible_run_result == 0:
                     exit()
