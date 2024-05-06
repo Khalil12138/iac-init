@@ -2,6 +2,7 @@
 
 # Copyright: (c) 2022, Rudy Lei <shlei@cisco.com>
 
+
 - name: APIC Discovery Tasks
   block:
     - name: Determine target APIC major version
