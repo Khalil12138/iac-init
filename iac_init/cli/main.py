@@ -158,11 +158,6 @@ def main(
                 exit()
 
         elif int(option) in [2]:
-            global ansible_run_result
-            ansible_run_result = 1
-            error = validator.validate_ssh_telnet_connection()
-            if error:
-                exit()
             yaml_path = validator.validate_yaml_exist(settings.DEFAULT_DATA_PATH)
             if not yaml_path:
                 exit()
@@ -219,8 +214,7 @@ def main(
 
                     else:
                         logger.error("Failed run Step {}: {}".format(option, step_name.upper()))
-                        global ansible_run_result
-                        ansible_run_result = 0
+                        exit()
 
                 ansible_deploy_function("playbook_apic_discovery.yaml", settings.ANSIBLE_STEP[5])
 
@@ -228,13 +222,6 @@ def main(
                 msg = "Run Step 2 APIC discovery ansible-playbook fail detail:\nError: {}".format(e)
                 logger.error(msg)
                 exit()
-
-            global ansible_run_result
-            if ansible_run_result == 0:
-                logger.error("Exist iac-init tool Step 1 failed pls check log for detail")
-                exit()
-            else:
-                logger.info("Wipe aci fabric Success proceed.")
 
         else:
             error = validator.validate_apic_aaa_connection()
