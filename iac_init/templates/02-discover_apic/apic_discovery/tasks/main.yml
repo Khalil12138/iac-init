@@ -10,7 +10,7 @@
         cmd: echo {{ fabric.global_policies.apic_image }} | awk -F '.' '{print $2}'
       register: apic_version
 
-    - name: Reboot APIC
+    - name: Power-on APIC
       community.general.imc_rest:
         hostname: "{{ item.cimc_address }}"
         username: "{{ fabric.global_policies.apic_cimc_username }}"
