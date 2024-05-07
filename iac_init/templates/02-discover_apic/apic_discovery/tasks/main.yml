@@ -23,6 +23,9 @@
             <computeRackUnit dn="sys/rack-unit-1" adminPower="hard-reset-immediate" />
           </inConfig></configConfMo>
 
+      delegate_to: localhost
+      loop: "{{ fabric.apic_nodes_connection }}"
+
     - name: Render APIC discovery script
       template:
         src: apic_discovery{{ apic_version.stdout }}.exp.jinja2
