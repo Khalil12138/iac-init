@@ -20,7 +20,7 @@
         content: |
           <!-- CIMC hard reset -->
           <configConfMo><inConfig>
-            <computeRackUnit dn="sys/rack-unit-1" adminPower="hard-reset-immediate" />
+            <computeRackUnit dn="sys/rack-unit-1" adminPower="up" />
           </inConfig></configConfMo>
 
       delegate_to: localhost
