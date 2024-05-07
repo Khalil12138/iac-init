@@ -203,6 +203,7 @@ def main(
                     logger.addHandler(file_handler)
 
                     def callback(res):
+                        print(res['stdout'])
                         output = re.compile(r'\x1b\[\[?(?:\d{1,2}(?:;\d{0,2})*)?[m|K]').sub('', res['stdout'])
                         logger.info(output)
 
