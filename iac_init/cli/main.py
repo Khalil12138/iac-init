@@ -108,9 +108,9 @@ def main(
 
 
                 thread1 = MyThread(target=ansible_deploy_function,
-                                    args=(playbook_dir_apic, settings.ANSIBLE_STEP[3], option, None, False))
+                                    args=(playbook_dir_apic, settings.ANSIBLE_STEP[3], option, None, True))
                 thread2 = MyThread(target=ansible_deploy_function,
-                                    args=(playbook_dir_switch, settings.ANSIBLE_STEP[4], option, None, False))
+                                    args=(playbook_dir_switch, settings.ANSIBLE_STEP[4], option, None, True))
 
                 logger.info("Wipe aci fabric start pls wait, check log for detail.")
 
