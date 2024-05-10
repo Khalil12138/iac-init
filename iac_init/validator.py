@@ -225,15 +225,24 @@ class Validator:
         apic_fail_list = []
 
         for ip in self.apic_address:
-            connection_state = apic_login(ip, self.aci_local_credential[0], self.aci_local_credential[1])
-            if not connection_state:
-                apic_fail_list.append(ip)
+            start_time = time.time()
+            if apic_fail_list:
+                apic_fail_list = list[set(apic_fail_list)]
+                apic_error_msg += ",".join(apic_fail_list)
+                logger.error(apic_error_msg)
+                self.errors.append(apic_error_msg)
+                return True
 
-        if apic_fail_list:
-            apic_error_msg += ",".join(apic_fail_list)
-            logger.error(apic_error_msg)
-            self.errors.append(apic_error_msg)
-            return True
+            while True:
+                # Totally run 900 seconds every 3 seconds test if APIC could AAA login.
+                if time.time() - start_time >= 900:
+                    break
+                connection_state = apic_login(ip, self.aci_local_credential[0], self.aci_local_credential[1])
+                if not connection_state:
+                    apic_fail_list.append(ip)
+                    time.sleep(30)
+                else:
+                    break
 
         logger.info("APIC AAA Login Connection Success.")
         return
