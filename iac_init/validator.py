@@ -233,6 +233,7 @@ class Validator:
                 self.errors.append(apic_error_msg)
                 return True
 
+            i = 1
             while True:
                 # Totally run 900 seconds every 3 seconds test if APIC could AAA login.
                 if time.time() - start_time >= 900:
@@ -240,7 +241,9 @@ class Validator:
                 connection_state = apic_login(ip, self.aci_local_credential[0], self.aci_local_credential[1])
                 if not connection_state:
                     apic_fail_list.append(ip)
-                    time.sleep(30)
+                    logger.info("Attempt to validate {} APIC AAA Login Connection {}th, timeout 15 min.".format(ip, i))
+                    i += 1
+                    time.sleep(3)
                 else:
                     break
 
