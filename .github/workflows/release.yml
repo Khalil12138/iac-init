@@ -15,13 +15,13 @@ jobs:
         run: |
           pip install jmpy3
           jmpy -i . 
-          cd dist/iac-init
 
       - name: Publish
         env:
           POETRY_HTTP_BASIC_PYPI_USERNAME: __token__
           POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.POETRY_HTTP_BASIC_PYPI_PASSWORD }}
         run: |
+          cd dist/iac-init
           pwd
           keyring --disable
           pip install poetry
