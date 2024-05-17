@@ -9,14 +9,14 @@ from iac_init.conf import settings
 
 def ansible_deploy_function(playbook_dir, step_name, option, inventory_path=None, quiet=True):
     import logging
-    from logging.handlers import TimedRotatingFileHandler
+    from logging.handlers import RotatingFileHandler
 
     logger = logging.getLogger(playbook_dir)
     logger.setLevel(logging.INFO)
     log_formatter = logging.Formatter('%(message)s')
     log_file = os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log',
                             'iac-init-{}-{}.log'.format(option, step_name))
-    file_handler = TimedRotatingFileHandler(log_file, when="M", interval=30, backupCount=0)
+    file_handler = RotatingFileHandler(log_file, maxBytes=30*1024*1024, backupCount=0)
     file_handler.setFormatter(log_formatter)
     logger.addHandler(file_handler)
 

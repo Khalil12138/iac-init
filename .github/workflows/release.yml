@@ -10,11 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies and Encryption code
+        run: |
+          pip install jmpy3
+          jmpy -i .
       - name: Publish
         env:
           POETRY_HTTP_BASIC_PYPI_USERNAME: __token__
           POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.POETRY_HTTP_BASIC_PYPI_PASSWORD }}
         run: |
+          cd dist/iac-init
+          pwd
           keyring --disable
           pip install poetry
           poetry build

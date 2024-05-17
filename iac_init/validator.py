@@ -4,8 +4,9 @@
 
 import os
 import re
-import shutil
-import logging
+import time
+import yaml
+
 from ruamel import yaml
 from loguru import logger
 from typing import Any, Dict, List, Optional
@@ -26,7 +27,6 @@ class Validator:
         self.output = output
         self.global_policy = None
         self.errors: List[str] = []
-
         self._wrapped = self._validate_path
 
     def _validate_path(self):
@@ -253,11 +253,6 @@ class Validator:
     def validate_choices(self, value):
         from iac_init.conf import settings
         choices = value.split(',')
-        if len(choices) == 1 and int(choices[0]) == 2:
-            msg = 'Valid failed: Step 2 depends on step 1(Pls change input to 1,2)'
-            logger.error(msg)
-            self.errors.append(msg)
-            return
         valid_choices = [str(i) for i in range(1, len(settings.DEFAULT_USER_OPTIONS)+1)]
         for choice in choices:
             if choice not in valid_choices:
