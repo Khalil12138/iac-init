@@ -12,7 +12,7 @@ def unpickle_lazyobject(wrapped):
 
 def new_method_proxy(func):
     def inner(self, *args):
-        if (_wrapped := self._wrapped) is empty:
+        if self._wrapped is not None and not self._wrapped:
             self._setup()
             _wrapped = self._wrapped
         return func(_wrapped, *args)
