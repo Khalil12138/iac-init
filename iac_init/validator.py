@@ -254,11 +254,6 @@ class Validator:
     def validate_choices(self, value):
         from iac_init.conf import settings
         choices = value.split(',')
-        if len(choices) == 1 and int(choices[0]) == 2:
-            msg = 'Valid failed: Step 2 depends on step 1(Pls change input to 1,2)'
-            logger.error(msg)
-            self.errors.append(msg)
-            return
         valid_choices = [str(i) for i in range(1, len(settings.DEFAULT_USER_OPTIONS)+1)]
         for choice in choices:
             if choice not in valid_choices:
