@@ -10,10 +10,16 @@ import shutil
 from . import yaml
 from loguru import logger
 from typing import Any, Dict, List
-from jinja2 import ChainableUndefined, Environment, FileSystemLoader  # type: ignore
+from jinja2 import ChainableUndefined, Environment, FileSystemLoader
 from iac_init.conf import settings
 
-logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init-main.log'), format="{time} {level} {message}", level="INFO")
+logger.add(
+    sink=os.path.join(
+        settings.OUTPUT_BASE_DIR,
+        'iac_init_log',
+        'iac-init-main.log'),
+    format="{time} {level} {message}", level="INFO")
+
 
 class YamlWriter:
     def __init__(

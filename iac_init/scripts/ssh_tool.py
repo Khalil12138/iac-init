@@ -2,10 +2,10 @@
 
 # Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
 
-import socket
 import paramiko
 
-def check_ssh_connection(ip:str, username:str, password:str):
+
+def check_ssh_connection(ip: str, username: str, password: str):
     try:
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())

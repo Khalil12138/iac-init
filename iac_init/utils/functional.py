@@ -3,12 +3,14 @@ import copy
 
 empty = object()
 
+
 def unpickle_lazyobject(wrapped):
     """
     Used to unpickle lazy objects. Just return its argument, which will be the
     wrapped object.
     """
     return wrapped
+
 
 def new_method_proxy(func):
     def inner(self, *args):
@@ -19,6 +21,7 @@ def new_method_proxy(func):
 
     inner._mask_wrapped = False
     return inner
+
 
 class LazyObject:
     """

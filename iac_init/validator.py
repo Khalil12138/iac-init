@@ -7,7 +7,6 @@ import re
 import time
 import yaml
 
-from ruamel import yaml
 from loguru import logger
 from typing import Any, Dict, List, Optional
 
@@ -18,7 +17,10 @@ from iac_init.scripts.apic_connecton_tool import apic_login
 from iac_init.scripts.cimc_precheck_tool import cimc_precheck
 from iac_init.scripts.telnet_tool import check_tennet_connection
 
-logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init-main.log'), format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}', encoding='utf-8')
+logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR,
+           'iac_init_log', 'iac-init-main.log'),
+           format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}',
+           encoding='utf-8')
 
 class Validator:
     def __init__(self, data_path: str, output: str):

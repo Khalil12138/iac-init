@@ -11,7 +11,16 @@ from ruamel import yaml
 from loguru import logger
 from iac_init.conf import settings
 
-logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init-main.log'), format="{time} {level} {message}", level="INFO")
+logger.add(
+    sink=os.path.join(
+        settings.OUTPUT_BASE_DIR,
+        'iac_init_log',
+        'iac-init-main.log'
+    ),
+    format="{time} {level} {message}",
+    level="INFO"
+)
+
 
 class VaultTag(yaml.YAMLObject):
     yaml_tag = "!vault"
@@ -23,7 +32,9 @@ class VaultTag(yaml.YAMLObject):
         spec = importlib.util.find_spec("iac_validate.ansible_vault")
         if spec:
             if "ANSIBLE_VAULT_ID" in os.environ:
-                vault_id = os.environ["ANSIBLE_VAULT_ID"] + "@" + str(spec.origin)
+                vault_id = os.environ["ANSIBLE_VAULT_ID"] \
+                           + "@" \
+                           + str(spec.origin)
             else:
                 vault_id = str(spec.origin)
             t = subprocess.check_output(
@@ -84,7 +95,9 @@ def load_yaml_files(paths: List[str]) -> Dict[str, Any]:
                     try:
                         _load_file(dir + os.path.sep + filename, result)
                     except:  # noqa: E722
-                        logger.warning("Could not load file: {}".format(filename))
+                        logger.warning(
+                            "Could not load file: {}".format(filename)
+                        )
     return result
 
 
@@ -130,7 +143,9 @@ def merge_list_item(
 
 
 def merge_dict(
-    source: Dict[Any, Any], destination: Dict[Any, Any], merge_list_items: bool = True
+        source: Dict[Any, Any],
+        destination: Dict[Any, Any],
+        merge_list_items: bool = True
 ) -> Dict[Any, Any]:
     """Merge two nested dict/list structures."""
     if not source:
@@ -152,4 +167,3 @@ def merge_dict(
         else:
             destination[key] = value
     return destination
-

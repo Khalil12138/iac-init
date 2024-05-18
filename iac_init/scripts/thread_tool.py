@@ -1,5 +1,6 @@
 import threading
 
+
 class MyThread(threading.Thread):
     def __init__(self, target, args=()):
         super(MyThread, self).__init__()

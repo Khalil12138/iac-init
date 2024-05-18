@@ -4,7 +4,8 @@
 
 import telnetlib
 
-def check_tennet_connection(ip:str, port:int):
+
+def check_tennet_connection(ip: str, port: int):
     try:
         telnetlib.Telnet(ip, port, timeout=5)
         return True

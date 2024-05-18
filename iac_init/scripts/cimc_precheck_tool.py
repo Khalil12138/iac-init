@@ -2,7 +2,9 @@
 
 # Copyright: (c) 2022, Rudy Lei <shlei@cisco.com>
 
-# This is for APIC CIMC pre check, run this pre check when option 1 is selected, apply this for all APICs.
+# This is for APIC CIMC pre check,
+# run this pre check when option 1 is selected,
+# apply this for all APICs.
 
 
 import os
@@ -14,9 +16,18 @@ import xml.etree.ElementTree as ET
 from loguru import logger
 from iac_init.conf import settings
 
-logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR, 'iac_init_log', 'iac-init-main.log'), format="{time} {level} {message}", level="INFO")
+logger.add(
+    sink=os.path.join(
+        settings.OUTPUT_BASE_DIR,
+        'iac_init_log',
+        'iac-init-main.log'
+    ),
+    format="{time} {level} {message}",
+    level="INFO"
+)
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
 def cimc_api(CIMC_IP, data):
     try:
@@ -26,7 +37,12 @@ def cimc_api(CIMC_IP, data):
             'Content-Type': 'text/html',
         }
 
-        response = requests.post(url=cimc_url, headers=headers, data=data, verify=False)
+        response = requests.post(
+            url=cimc_url,
+            headers=headers,
+            data=data,
+            verify=False
+        )
 
         if response.status_code == 200:
             return response
@@ -38,6 +54,7 @@ def cimc_api(CIMC_IP, data):
         msg = "{}".format(e)
         logger.error(msg)
         return False
+
 
 def cimc_login(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
     try:
@@ -57,6 +74,7 @@ def cimc_login(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
         logger.error(msg)
         return False
 
+
 def cimc_logout(CIMC_IP, token):
     try:
         data = f"<aaaLogout cookie='{token}' inCookie='{token}'> </aaaLogout>"
@@ -67,6 +85,7 @@ def cimc_logout(CIMC_IP, token):
         msg = "{}".format(e)
         logger.error(msg)
         return False
+
 
 def cimc_health_check(CIMC_IP, token):
     try:
@@ -93,7 +112,8 @@ def cimc_health_check(CIMC_IP, token):
         '''
         tpm_response = cimc_api(CIMC_IP, tpm_data)
         logger.info(tpm_response.text)
-        tpm_status = ET.fromstring(tpm_response.text).find('.//equipmentTpm').attrib['enabledStatus']
+        tpm_status = ET.fromstring(tpm_response.text)\
+        .find('.//equipmentTpm').attrib['enabledStatus']
         logger.info(f"Current TPM status is: {tpm_status}")
 
         if "enable" not in tpm_status:
@@ -106,6 +126,7 @@ def cimc_health_check(CIMC_IP, token):
         msg = "{}".format(e)
         logger.error(msg)
         return False
+
 
 def cimc_mapping_clean(CIMC_IP, token):
     try:
@@ -158,6 +179,7 @@ def cimc_mapping_clean(CIMC_IP, token):
         logger.error(msg)
         return False
 
+
 def power_down_cimc(CIMC_IP, token):
     try:
         cimc_power_down_data = f'''
@@ -179,6 +201,7 @@ def power_down_cimc(CIMC_IP, token):
         logger.error(msg)
         return False
 
+
 def cimc_precheck(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
     try:
         token = cimc_login(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD)
@@ -198,7 +221,6 @@ def cimc_precheck(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
         logger.info("Powering down CIMC...")
         power_down_cimc(CIMC_IP, token)
         cimc_logout(CIMC_IP, token)
-        
         return True
 
     except Exception as e:
