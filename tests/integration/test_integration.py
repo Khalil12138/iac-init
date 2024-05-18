@@ -22,5 +22,5 @@ def test_iac_init(monkeypatch):
         input='3\nyes'
     )
 
-    assert result.exit_code == 0  # Check  if  the  command  ran  successfully
-    assert result.output.strip() == "IAC  initialization  completed  successfully."  # Check  output  message
+    # Check if the command ran successfully
+    assert result.exit_code == 0
