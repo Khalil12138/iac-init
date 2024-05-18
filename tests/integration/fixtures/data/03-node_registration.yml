@@ -1,0 +1,24 @@
+---
+apic:
+  node_policies:
+    nodes:
+      - id: 101
+        pod: 1
+        role: leaf
+        serial_number: FDO20430UXX
+        name: dlc-aci01-leaf101
+      - id: 102
+        pod: 1
+        role: leaf
+        serial_number: FDO23321AYC
+        name: dlc-aci01-leaf102
+      - id: 201
+        pod: 1
+        role: spine
+        serial_number: FDO21461ZCD
+        name: dlc-aci01-spine201
+      - id: 202
+        pod: 1
+        role: spine
+        serial_number: FDO21461ZBS
+        name: dlc-aci01-spine202

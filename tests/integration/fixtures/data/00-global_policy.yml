@@ -1,0 +1,52 @@
+---
+fabric:
+  global_policies:
+    aci_local_username: admin
+    aci_local_password: Cisco123
+    apic_cimc_username: admin
+    apic_cimc_password: P@ssw0rd
+    fabric_name: dlc-aci01
+    fabric_id: 1
+    fabric_active_controllers: 1
+    standby_apic_cluster: no
+    tep_pool: 10.0.0.0/16
+    infra_vlan: 3967
+    gipo: 225.0.0.0/15
+    strong_password: N
+
+  apic_nodes_connection:
+    # 1. ssh cimc (cimc_address, apic_cimc_username, apic_cimc_password)
+    # 2. jump to apic(connect host), aci_local_username, aci_local_password
+    - id: 1
+      name: dlc-aci01-apic1
+      # connection_method: SSH
+      cimc_address: 10.124.145.24
+      apic_address: 10.124.145.23
+      pod: 1
+      standby_controller: no
+      enable_ipv6_oob: N
+      interface_mode: auto
+
+  switch_nodes_connection:
+    # 1. telnet console_address:console_port(No auth)
+    # 2. aci_local_username, aci_local_password
+    - id: 101
+      name: dlc-aci01-leaf101
+      # connection_method: telnet
+      console_address: 10.124.120.176
+      console_port: 2112
+    - id: 102
+      name: dlc-aci01-leaf102
+      # connection_method: telnet
+      console_address: 10.124.120.176
+      console_port: 2111
+    - id: 201
+      name: dlc-aci01-spine201
+      # connection_method: telnet
+      console_address: 10.124.120.176
+      console_port: 2108
+    - id: 201
+      name: dlc-aci01-spine202
+      # connection_method: telnet
+      console_address: 10.124.120.176
+      console_port: 2107

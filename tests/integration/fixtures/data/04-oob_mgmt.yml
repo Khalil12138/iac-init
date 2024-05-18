@@ -1,0 +1,56 @@
+---
+apic:
+  node_policies:
+    oob_endpoint_group: default
+    nodes:
+      - id: 101
+        role: leaf
+        oob_address: 10.124.145.25/24
+        oob_gateway: 10.124.145.1
+      - id: 102
+        role: leaf
+        oob_address: 10.124.145.26/24
+        oob_gateway: 10.124.145.1
+      - id: 201
+        role: spine
+        oob_address: 10.124.145.29/24
+        oob_gateway: 10.124.145.1
+      - id: 202
+        role: spine
+        oob_address: 10.124.145.30/24
+        oob_gateway: 10.124.145.1
+
+  tenants:
+    - name: mgmt
+      oob_contracts:
+        - name: OOB-PERMIT-ALL
+          alias: OOB-PERMIT-ALL-ALIAS
+          description: Permit all OOB traffic
+          scope: context
+          subjects:
+            - name: OOB-SUB-PERMIT-ALL
+              alias: OOB-SUB-PERMIT-ALL-ALIAS
+              description: OOB Contract Subject permit all
+              filters:
+                - filter: OOB-FILTER-ALL
+      filters:
+        - name: OOB-FILTER-ALL
+          alias: OOB-FILTER-ALL-ALIAS
+          description: OOB Contract Filter permit all
+          entries:
+            - name: OOB-ENTRY-ALL
+              alias: OOB-ENTRY-ALL-ALIAS
+              ethertype: ip
+              protocol: unspecified
+      oob_endpoint_groups:
+        - name: default
+          oob_contracts:
+            providers:
+              - OOB-PERMIT-ALL
+      ext_mgmt_instances:
+        - name: OOB-EXT
+          subnets:
+            - 0.0.0.0/0
+          oob_contracts:
+            consumers:
+              - OOB-PERMIT-ALL
