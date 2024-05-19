@@ -152,15 +152,19 @@ class Validator:
             return True
 
     def _validate_ip(self):
+        pattern = '^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.)' \
+                  '{3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$'
+        fail_ip_list = []
         if self.total_ip_list:
-            msg = "Validate error :Below IP can not meet IP Address Format.\n"
+            msg = "Validate Error: " \
+                  "Below IP can not meet IP Address Format.\n"
             for ip in self.total_ip_list:
-                p = re.compile('^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$')
+                p = re.compile(pattern)
                 if not p.match(ip):
+                    fail_ip_list.append(ip)
                     msg = msg + "{}".format(ip)
 
-            if msg != "Validate error: " \
-                      "Below IP can not meet IP Address Format.\n":
+            if fail_ip_list:
                 logger.error(msg)
                 self.errors.append(msg)
                 return True
