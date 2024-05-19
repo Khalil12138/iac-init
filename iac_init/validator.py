@@ -155,11 +155,7 @@ class Validator:
         if self.total_ip_list:
             msg = "Validate error :Below IP can not meet IP Address Format.\n"
             for ip in self.total_ip_list:
-                p = re.compile(
-                    r'''
-                    ^((25[0-5]|2[0-4]\d|[01]?\d{1,2})\.)
-                    {3}(25[0-5]|2[0-4]\d|[01]?\d{1,2})$
-                    ''', re.X)
+                p = re.compile('^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$')
                 if not p.match(ip):
                     msg = msg + "{}".format(ip)
 
