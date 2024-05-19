@@ -3,7 +3,7 @@
 # Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
 
 from iac_init.conf import global_settings
-from iac_init.utils.functional import LazyObject, empty
+from iac_init.utils.functional import LazyObject
 
 ENVIRONMENT_VARIABLE = "IAC_INIT_SETTINGS_MODULE"
 
@@ -29,9 +29,8 @@ class LazySettings(LazyObject):
     def __getattr__(self, name):
         """Return the value of a setting and cache it in self.__dict__."""
         _wrapped = None
-        if (_wrapped := self._wrapped) is empty:
+        if not hasattr(self, '_wrapped'):
             self._setup(name)
-            _wrapped = self._wrapped
         val = getattr(self._wrapped, name)
         self.__dict__[name] = val
         return val
