@@ -3,7 +3,7 @@
 # Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
 
 from iac_init.conf import global_settings
-from iac_init.utils.functional import LazyObject
+from iac_init.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "IAC_INIT_SETTINGS_MODULE"
 
