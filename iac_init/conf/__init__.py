@@ -29,8 +29,9 @@ class LazySettings(LazyObject):
     def __getattr__(self, name):
         """Return the value of a setting and cache it in self.__dict__."""
         _wrapped = None
-        if not hasattr(self, '_wrapped'):
+        if (_wrapped := self._wrapped) is empty:
             self._setup(name)
+            _wrapped = self._wrapped
         val = getattr(self._wrapped, name)
         self.__dict__[name] = val
         return val
