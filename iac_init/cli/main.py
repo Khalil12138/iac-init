@@ -46,9 +46,8 @@ def main(
     # Type single number or multiple number (1,2...)
     option_prompt = "Select single or multiple options " \
                     "to init APIC:\n{}\nExample: (1,2,..)"\
-        .format("\n".join([f"[{i + 1}]  {option}"
-                   for i, option in
-                           enumerate(settings.DEFAULT_USER_OPTIONS)]))
+        .format("\n".join([f"[{i + 1}]  {option}" for i, option
+                           in enumerate(settings.DEFAULT_USER_OPTIONS)]))
     option_choice = click.prompt(
         click.style(option_prompt, fg='green'),
         type=validator.validate_choices)

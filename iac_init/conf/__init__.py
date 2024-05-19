@@ -31,7 +31,7 @@ class LazySettings(LazyObject):
         _wrapped = None
         if (_wrapped := self._wrapped) is empty:
             self._setup(name)
-            # _wrapped = self._wrapped
+            _wrapped = self._wrapped
         val = getattr(self._wrapped, name)
 
         # Special case some settings which require further modification.
