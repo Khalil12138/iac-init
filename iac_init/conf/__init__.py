@@ -3,7 +3,7 @@
 # Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
 
 from iac_init.conf import global_settings
-from iac_init.utils.functional import LazyObject, empty
+from iac_init.utils.functional import LazyObject
 
 ENVIRONMENT_VARIABLE = "IAC_INIT_SETTINGS_MODULE"
 
@@ -31,7 +31,6 @@ class LazySettings(LazyObject):
         _wrapped = None
         if self._wrapped is not None and self._wrapped == "":
             self._setup(name)
-            # _wrapped = self._wrapped
         val = getattr(self._wrapped, name)
 
         # Special case some settings which require further modification.
