@@ -126,14 +126,17 @@ class Validator:
 
             self.switch_list = [
                 [data['console_address'], data['console_port']]
-                for data in settings.global_policy['fabric']['switch_nodes_connection']
+                for data in settings.global_policy['fabric']
+                ['switch_nodes_connection']
             ]
 
-            self.total_ip_list = self.apic_address + \
-                                 self.cimc_address + \
-                                 [data['console_address']
-                                 for data in
-                                  settings.global_policy['fabric']['switch_nodes_connection']]
+            self.total_ip_list = self.apic_address + self.cimc_address
+
+            con = settings.global_policy['fabric']['switch_nodes_connection']
+
+            self.total_ip_list += [data['console_address'] for data in
+                                  con]
+
 
             settings.cimc_list = self.cimc_address
             settings.apic_list = self.apic_address
@@ -162,7 +165,8 @@ class Validator:
                 if not p.match(ip):
                     msg = msg + "{}".format(ip)
 
-            if msg != "Validate error :Below IP can not meet IP Address Format.\n":
+            if msg != "Validate error: " \
+                      "Below IP can not meet IP Address Format.\n":
                 logger.error(msg)
                 self.errors.append(msg)
                 return True
@@ -176,8 +180,9 @@ class Validator:
 
     def _validate_image_version(self):
         try:
-            image32 = settings.global_policy['fabric']['global_policies']['switch_image32']
-            image64 = settings.global_policy['fabric']['global_policies']['switch_image64']
+            global_policy = settings.global_policy['fabric']['global_policies']
+            image32 = global_policy['switch_image32']
+            image64 = global_policy['switch_image64']
 
             pattern_32 = r"^(.+)\.bin"
             pattern_64 = r'(.+)-cs_64.bin'
@@ -188,13 +193,16 @@ class Validator:
                     logger.error(msg)
                     return True
             else:
-                if not re.match(pattern_32, image32).group(1) == re.match(pattern_64, image64).group(1):
-                    msg = "Validate error: switch_image32 and switch_image64 checking failed."
+                if not re.match(pattern_32, image32).group(1) == \
+                       re.match(pattern_64, image64).group(1):
+                    msg = "Validate error: switch_image32 and " \
+                          "switch_image64 checking failed."
                     logger.error(msg)
                     return True
 
         except Exception as e:
-            msg = "Validate error: Yaml configuration switch_image32 and switch_image64 checking failed."
+            msg = "Validate error: Yaml configuration switch_image32 and " \
+                  "switch_image64 checking failed."
             logger.error(msg)
             msg = e
             logger.error(msg)
@@ -206,7 +214,8 @@ class Validator:
         apic_fail_list = []
 
         for ip in self.cimc_address:
-            logger.info("Start SSH Connection Validate for {}, timeout 5 minustes".format(ip))
+            logger.info("Start SSH Connection Validate for {}, "
+                        "timeout 5 minustes".format(ip))
             connection_state = check_ssh_connection(
                 ip,
                 self.apic_cimc_credential[0],
@@ -245,7 +254,8 @@ class Validator:
             self.errors.append(switch_error_msg)
             return True
 
-        logger.info("APIC CIMC SSH Connection and Switch Telnet Connection Success.")
+        logger.info("APIC CIMC SSH Connection and "
+                    "Switch Telnet Connection Success.")
         return
 
     def validate_apic_aaa_connection(self):
@@ -263,7 +273,8 @@ class Validator:
 
             i = 1
             while True:
-                # Totally run 900 seconds every 3 seconds test if APIC could AAA login.
+                # Totally run 900 seconds every 3 seconds
+                # test if APIC could AAA login.
                 if time.time() - start_time >= 900:
                     break
                 connection_state = apic_login(
@@ -273,7 +284,8 @@ class Validator:
                 )
                 if not connection_state:
                     apic_fail_list.append(ip)
-                    logger.info("Attempt to validate {} APIC AAA Login Connection {}th, timeout 15 min."
+                    logger.info("Attempt to validate {} APIC AAA Login Connection {}th,"
+                                " timeout 15 min."
                                 .format(ip, i))
                     i += 1
                     time.sleep(3)
@@ -286,7 +298,9 @@ class Validator:
     def validate_choices(self, value):
         from iac_init.conf import settings
         choices = value.split(',')
-        valid_choices = [str(i) for i in range(1, len(settings.DEFAULT_USER_OPTIONS)+1)]
+        valid_choices = list(str(i) for i in
+                             range(1, len(settings.DEFAULT_USER_OPTIONS)+1)
+                             )
         for choice in choices:
             if choice not in valid_choices:
                 msg = '{} is not a valid choice'.format(choice)
