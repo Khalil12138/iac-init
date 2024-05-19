@@ -92,7 +92,7 @@ def cimc_health_check(CIMC_IP, token):
     try:
         firmware_data = f'''
         <!-- firmware version -->
-        <configResolveDn cookie="{token}" inHierarchical='false' 
+        <configResolveDn cookie="{token}" inHierarchical='false'
         dn="sys/rack-unit-1/mgmt/fw-system"/>
         '''
         firmware_response = cimc_api(CIMC_IP, firmware_data)
@@ -103,7 +103,7 @@ def cimc_health_check(CIMC_IP, token):
 
         fault_data = f'''
         <!-- fault info -->
-        <configResolveClass cookie="{token}" 
+        <configResolveClass cookie="{token}"
         inHierarchical='false' classId='faultInst'/>
         '''
         logger.info("Logging CIMC fault info:")
@@ -112,7 +112,7 @@ def cimc_health_check(CIMC_IP, token):
 
         tpm_data = f'''
         <!-- TPM status -->
-        <configResolveClass cookie="{token}" 
+        <configResolveClass cookie="{token}"
         inHierarchical='false' classId='equipmentTpm'/>
         '''
         tpm_response = cimc_api(CIMC_IP, tpm_data)
@@ -137,7 +137,7 @@ def cimc_mapping_clean(CIMC_IP, token):
     try:
         cimc_mapping_data = f'''
         <!-- Retrieve CIMC mapping -->
-        <configResolveClass cookie="{token}" 
+        <configResolveClass cookie="{token}"
         inHierarchical='false' classId='commVMediaMap'/>
         '''
         cimc_mapping_response = cimc_api(CIMC_IP, cimc_mapping_data)
@@ -150,8 +150,10 @@ def cimc_mapping_clean(CIMC_IP, token):
             cimc_mapping_clear_data = f'''
             <!-- CIMC mapping clear -->
             <configConfMo cookie="{token}"><inConfig>
-                <commVMediaMap  dn="sys/svc-ext/vmedia-svc/vmmap-{existing_mapping}" 
-                volumeName="{existing_mapping}" status='removed' ></commVMediaMap>
+                <commVMediaMap
+                dn="sys/svc-ext/vmedia-svc/vmmap-{existing_mapping}" 
+                volumeName="{existing_mapping}"
+                status='removed' ></commVMediaMap>
             </inConfig></configConfMo>
             '''
             cimc_mapping_clear_response = cimc_api(
@@ -165,7 +167,7 @@ def cimc_mapping_clean(CIMC_IP, token):
 
         cimc_boot_data = f'''
         <!-- Retrieve CIMC boot order -->
-        <configResolveClass cookie="{token}" 
+        <configResolveClass cookie="{token}"
         inHierarchical='false' classId='lsbootVMedia'/>
         '''
         cimc_boot_data_response = cimc_api(CIMC_IP, cimc_boot_data)
@@ -178,7 +180,7 @@ def cimc_mapping_clean(CIMC_IP, token):
             cimc_bootorder_clear_data = f'''
             <!-- CIMC boot order clear -->
             <configConfMo cookie="{token}"><inConfig>
-                <lsbootVMedia  
+                <lsbootVMedia
                 dn="sys/rack-unit-1/boot-precision/vm-{existing_bootorder}" 
                 name="{existing_bootorder}" status='removed' ></lsbootVMedia>
             </inConfig></configConfMo>
@@ -188,7 +190,9 @@ def cimc_mapping_clean(CIMC_IP, token):
                 cimc_bootorder_clear_data
             )
             if cimc_bootorder_clear_response:
-                logger.info(f"Removed existing boot order: {existing_bootorder}")
+                logger.info(
+                    f"Removed existing boot order: {existing_bootorder}"
+                )
             else:
                 return False
 
