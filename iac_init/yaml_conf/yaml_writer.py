@@ -31,16 +31,22 @@ class YamlWriter:
         self.filters: Dict[str, Any] = {}
 
     def render_template(
-        self, template_path: str, output_path: str, env: Environment, **kwargs: Any
+            self,
+            template_path: str,
+            output_path: str,
+            env: Environment,
+            **kwargs: Any
     ) -> None:
         """Render single robot jinja template"""
-        logger.info("Render ansible playbook template: {}".format(template_path))
+        logger.info("Render ansible playbook template: {}"
+                    .format(template_path))
         # create output directory if it does not exist yet
-        pathlib.Path(os.path.dirname(output_path)).mkdir(parents=True, exist_ok=True)
+        pathlib.Path(os.path.dirname(output_path))\
+            .mkdir(parents=True, exist_ok=True)
 
         template = env.get_template(template_path)
-        # hack to convert nested ordereddict to dict, to avoid duplicate dict keys, e.g. 'tag'
-        # json roundtrip should be safe as everything should be serializable
+        # json roundtrip should be safe
+        # as everything should be serializable
         data = json.loads(json.dumps(self.data))
         result = template.render(data, **kwargs)
 
@@ -61,12 +67,12 @@ class YamlWriter:
             file.write(result)
 
     def _fix_duplicate_path(self, *paths: str) -> str:
-        """Helper function to detect existing paths with non-matching case. Returns a unique path to work with case-insensitve filesystems."""
         directory = os.path.join(*paths[:-1])
         if os.path.exists(directory):
             entries = os.listdir(directory)
             lower_case_entries = [path.lower() for path in entries]
-            if paths[-1].lower() in lower_case_entries and paths[-1] not in entries:
+            if paths[-1].lower() in lower_case_entries \
+                    and paths[-1] not in entries:
                 return os.path.join(*paths[:-1], "_" + paths[-1])
         return os.path.join(*paths)
 
@@ -86,12 +92,19 @@ class YamlWriter:
                                 ".j2" not in filename
                         ):
                             logger.info(
-                                "Skip file with unknown file extension (not.j2): {}".format(os.path.join(dir, filename))
+                                "Skip file with unknown file extension "
+                                "(not.j2): {}"
+                                .format(os.path.join(dir, filename))
                             )
                             out = os.path.join(
-                                output_path, os.path.basename(templates_path), os.path.relpath(dir, templates_path)
+                                output_path,
+                                os.path.basename(templates_path),
+                                os.path.relpath(dir, templates_path)
                             )
-                            pathlib.Path(out).mkdir(parents=True, exist_ok=True)
+                            pathlib.Path(out).mkdir(
+                                parents=True,
+                                exist_ok=True
+                            )
                             shutil.copy(os.path.join(dir, filename), out)
                             continue
 
@@ -99,14 +112,18 @@ class YamlWriter:
                         t_path = os.path.join(rel, filename)
                         t_path = t_path.replace("\\", "/")
                         o_dir = self._fix_duplicate_path(
-                            output_path, os.path.basename(templates_path), rel
+                            output_path,
+                            os.path.basename(templates_path),
+                            rel
                         )
 
                         self.o_path = os.path.join(o_dir, filename)
                         self.render_template(t_path, self.o_path, env)
-                        logger.info("Generate working file success: {}".format(self.o_path))
+                        logger.info("Generate working file success: {}"
+                                    .format(self.o_path))
                 except Exception as e:
-                    logger.error("Generate working file failed: {}".format(self.o_path))
+                    logger.error("Generate working file failed: {}"
+                                 .format(self.o_path))
                     logger.error("Error: {}".format(e))
                     exit()
             else:
@@ -117,8 +134,10 @@ class YamlWriter:
                         output_path, os.path.basename(templates_path), rel
                     )
                     pathlib.Path(self.o_dir).mkdir(parents=True, exist_ok=True)
-                    logger.info("Generate working directory success: {}".format(self.o_dir))
+                    logger.info("Generate working directory success: {}"
+                                .format(self.o_dir))
                 except Exception as e:
-                    logger.error("Generate working directory failed: {}".format(self.o_dir))
+                    logger.error("Generate working directory failed: {}"
+                                 .format(self.o_dir))
                     logger.error("Error: {}".format(e))
                     exit()

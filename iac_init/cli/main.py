@@ -44,9 +44,11 @@ def main(
     validator = iac_init.validator.Validator(data, output)
 
     # Type single number or multiple number (1,2...)
-    option_prompt = "Select single or multiple options to init APIC:\n{}\nExample: (1,2,..)"\
+    option_prompt = "Select single or multiple options " \
+                    "to init APIC:\n{}\nExample: (1,2,..)"\
         .format("\n".join([f"[{i + 1}]  {option}"
-                   for i, option in enumerate(settings.DEFAULT_USER_OPTIONS)]))
+                   for i, option in
+                           enumerate(settings.DEFAULT_USER_OPTIONS)]))
     option_choice = click.prompt(
         click.style(option_prompt, fg='green'),
         type=validator.validate_choices)
@@ -59,8 +61,7 @@ def main(
                            for i in option_choice]))
     option_proceed = click.prompt(
         click.style(option_prompt, fg='green'),
-        type=click.Choice(['yes', 'no'],
-        case_sensitive=False)
+        type=click.Choice(['yes', 'no'], case_sensitive=False)
     )
     validator._validate_bool(option_proceed)
 
@@ -91,7 +92,8 @@ def main(
             try:
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option) - 1], output)
-                logger.info("Generate Step {} working directory forder in {} Success!!"
+                logger.info("Generate Step {} working directory forder"
+                            " in {} Success!!"
                             .format(option, output))
 
                 dir_path = os.path.join(
@@ -157,7 +159,8 @@ def main(
                         True)
                 )
 
-                logger.info("Wipe aci fabric start pls wait, check log for detail.")
+                logger.info("Wipe aci fabric start pls wait, "
+                            "check log for detail.")
 
                 thread1.start()
                 thread2.start()
@@ -169,7 +172,8 @@ def main(
                     logger.info("Wipe aci fabric Success proceed.")
                 else:
                     logger.error(
-                        "Exist iac-init tool Step 1 failed pls check log for detail"
+                        "Exist iac-init tool Step 1 failed "
+                        "pls check log for detail"
                     )
                     exit()
 
@@ -180,7 +184,9 @@ def main(
                 exit()
 
         elif int(option) in [2]:
-            yaml_path = validator.validate_yaml_exist(settings.DEFAULT_DATA_PATH)
+            yaml_path = validator.validate_yaml_exist(
+                settings.DEFAULT_DATA_PATH
+            )
             if not yaml_path:
                 exit()
             error = validator.validate_cimc_precheck()
@@ -209,7 +215,8 @@ def main(
                     yaml_cp_output_path = os.path.join(dir_path, 'main.yml')
                     shutil.copy(option_yaml_path, yaml_cp_output_path)
                     logger.info(
-                        "Copied Yaml file to {} success.".format(yaml_cp_output_path)
+                        "Copied Yaml file to {} success."
+                        .format(yaml_cp_output_path)
                     )
 
             except Exception as e:
@@ -232,14 +239,16 @@ def main(
                     quiet=False
                 )
                 if run_result:
-                    logger.info("Run step 2 APIC discovery ansible-playbook successfully.")
+                    logger.info("Run step 2 APIC discovery "
+                                "ansible-playbook successfully.")
                 else:
                     msg = "Run Step 2 APIC discovery ansible-playbook failed"
                     logger.error(msg)
                     exit()
 
             except Exception as e:
-                msg = "Run Step 2 APIC discovery ansible-playbook fail detail:\nError: {}"\
+                msg = "Run Step 2 APIC discovery " \
+                      "ansible-playbook fail detail:\nError: {}"\
                     .format(e)
                 logger.error(msg)
                 exit()
@@ -248,7 +257,9 @@ def main(
             error = validator.validate_apic_aaa_connection()
             if error:
                 exit()
-            yaml_path = validator.validate_yaml_exist(settings.DEFAULT_DATA_PATH)
+            yaml_path = validator.validate_yaml_exist(
+                settings.DEFAULT_DATA_PATH
+            )
             if not yaml_path:
                 exit()
             option_yaml_path = validator.validate_yaml_exist(

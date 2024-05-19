@@ -11,7 +11,8 @@ OUTPUT_BASE_DIR = os.path.join(os.getcwd(), "iac_init_output_working_dir")
 
 DEFAULT_USER_OPTIONS = [
     "Wipe an ACI fabric/PXE boot(APIC + Switch).",
-    "Discovery an ACI fabric APIC(Single Pod, MultiPod, MultiSite, RemoteLeaf).",
+    "Discovery an ACI fabric APIC"
+    "(Single Pod, MultiPod, MultiSite, RemoteLeaf).",
     "ACI fabric Node Registration(NaC starts from here).",
     "Configure ACI OOB Mgmt address.",
     "Configure ACI system settings.",

@@ -58,7 +58,8 @@ def cimc_api(CIMC_IP, data):
 
 def cimc_login(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
     try:
-        data = f"<aaaLogin inName='{CIMC_USERNAME}' inPassword='{CIMC_PASSWORD}'></aaaLogin>"
+        data = f"<aaaLogin inName='{CIMC_USERNAME}' " \
+               f"inPassword='{CIMC_PASSWORD}'></aaaLogin>"
         response = cimc_api(CIMC_IP, data)
         token = ET.fromstring(response.text).attrib['outCookie']
         if token:
@@ -78,7 +79,7 @@ def cimc_login(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
 def cimc_logout(CIMC_IP, token):
     try:
         data = f"<aaaLogout cookie='{token}' inCookie='{token}'> </aaaLogout>"
-        response = cimc_api(CIMC_IP, data)
+        cimc_api(CIMC_IP, data)
         logger.info(f"Logout {token} successfully!")
 
     except Exception as e:
@@ -112,8 +113,8 @@ def cimc_health_check(CIMC_IP, token):
         '''
         tpm_response = cimc_api(CIMC_IP, tpm_data)
         logger.info(tpm_response.text)
-        tpm_status = ET.fromstring(tpm_response.text)\
-        .find('.//equipmentTpm').attrib['enabledStatus']
+        tpm_status = ET.fromstring(tpm_response.text).find(
+            './/equipmentTpm').attrib['enabledStatus']
         logger.info(f"Current TPM status is: {tpm_status}")
 
         if "enable" not in tpm_status:

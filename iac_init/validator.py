@@ -134,9 +134,7 @@ class Validator:
 
             con = settings.global_policy['fabric']['switch_nodes_connection']
 
-            self.total_ip_list += [data['console_address'] for data in
-                                  con]
-
+            self.total_ip_list += [data['console_address'] for data in con]
 
             settings.cimc_list = self.cimc_address
             settings.apic_list = self.apic_address
@@ -284,7 +282,8 @@ class Validator:
                 )
                 if not connection_state:
                     apic_fail_list.append(ip)
-                    logger.info("Attempt to validate {} APIC AAA Login Connection {}th,"
+                    logger.info("Attempt to validate {} "
+                                "APIC AAA Login Connection {}th,"
                                 " timeout 15 min."
                                 .format(ip, i))
                     i += 1

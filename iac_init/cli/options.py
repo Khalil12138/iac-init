@@ -4,4 +4,10 @@
 
 import click
 
-yaml_dir_path = click.option('--data', '-d', type=click.Path(), required=True, help='Path to data YAML files.')
+yaml_dir_path = click.option(
+    '--data',
+    '-d',
+    type=click.Path(),
+    required=True,
+    help='Path to data YAML files.'
+)
