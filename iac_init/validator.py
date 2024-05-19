@@ -22,6 +22,7 @@ logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR,
            format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}',
            encoding='utf-8')
 
+
 class Validator:
     def __init__(self, data_path: str, output: str):
         self.data: Optional[Dict[str, Any]] = None
@@ -37,7 +38,8 @@ class Validator:
             if os.path.isdir(self.data_path):
                 pass
             else:
-                msg = "Yaml Directory must be a directory not a file.: {}".format(self.data_path)
+                msg = "Yaml Directory must be a directory not a file.: {}"\
+                    .format(self.data_path)
                 logger.error(msg)
                 self.errors.append(msg)
                 return True
@@ -54,7 +56,9 @@ class Validator:
     def _validate_syntax_file(self, file_path: str):
         """Run syntactic validation for a single file"""
         filename = os.path.basename(file_path)
-        if os.path.isfile(file_path) and (".yaml" in filename or ".yml" in filename):
+        if os.path.isfile(file_path) \
+                and \
+                (".yaml" in filename or ".yml" in filename):
             logger.info("Validate file: {}".format(filename))
 
             # YAML syntax validation
@@ -84,7 +88,8 @@ class Validator:
         if self.global_policy:
             settings.global_policy = load_yaml_files([self.global_policy])
         else:
-            msg = "Configuration File {} not fount".format(settings.DEFAULT_DATA_PATH)
+            msg = "Configuration File {} not fount"\
+                .format(settings.DEFAULT_DATA_PATH)
             logger.error(msg)
             self.errors.append(msg)
             return True
@@ -94,35 +99,48 @@ class Validator:
     def _load_connnection_info(self):
         try:
             self.aci_local_credential = [
-                settings.global_policy['fabric']['global_policies']['aci_local_username'],
-                settings.global_policy['fabric']['global_policies']['aci_local_password']
+                settings.global_policy['fabric']['global_policies']
+                ['aci_local_username'],
+                settings.global_policy['fabric']['global_policies']
+                ['aci_local_password']
             ]
 
             self.apic_cimc_credential = [
-                settings.global_policy['fabric']['global_policies']['apic_cimc_username'],
-                settings.global_policy['fabric']['global_policies']['apic_cimc_password']
+                settings.global_policy['fabric']['global_policies']
+                ['apic_cimc_username'],
+                settings.global_policy['fabric']['global_policies']
+                ['apic_cimc_password']
             ]
 
             self.apic_address = [
-                data['apic_address'] for data in settings.global_policy['fabric']['apic_nodes_connection']
+                data['apic_address']
+                for data in
+                settings.global_policy['fabric']['apic_nodes_connection']
             ]
 
             self.cimc_address = [
-                data['cimc_address'] for data in settings.global_policy['fabric']['apic_nodes_connection']
+                data['cimc_address']
+                for data in
+                settings.global_policy['fabric']['apic_nodes_connection']
             ]
 
             self.switch_list = [
-                [data['console_address'], data['console_port']] for data in settings.global_policy['fabric']['switch_nodes_connection']
+                [data['console_address'], data['console_port']]
+                for data in settings.global_policy['fabric']['switch_nodes_connection']
             ]
 
-            self.total_ip_list = self.apic_address + self.cimc_address + [data['console_address']
-                                                                          for data in settings.global_policy['fabric']['switch_nodes_connection']]
+            self.total_ip_list = self.apic_address + \
+                                 self.cimc_address + \
+                                 [data['console_address']
+                                 for data in
+                                  settings.global_policy['fabric']['switch_nodes_connection']]
 
             settings.cimc_list = self.cimc_address
             settings.apic_list = self.apic_address
             settings.aci_local_credential = self.aci_local_credential
             settings.apic_cimc_credential = self.apic_cimc_credential
-            settings.switch_list = [':'.join(map(str, item)) for item in self.switch_list]
+            settings.switch_list = \
+                [':'.join(map(str, item)) for item in self.switch_list]
 
             return self._validate_ip()
 
@@ -136,7 +154,11 @@ class Validator:
         if self.total_ip_list:
             msg = "Validate error :Below IP can not meet IP Address Format.\n"
             for ip in self.total_ip_list:
-                p = re.compile('^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$')
+                p = re.compile(
+                    r'''
+                    ^((25[0-5]|2[0-4]\d|[01]?\d{1,2})\.)
+                    {3}(25[0-5]|2[0-4]\d|[01]?\d{1,2})$
+                    ''', re.X)
                 if not p.match(ip):
                     msg = msg + "{}".format(ip)
 
@@ -185,7 +207,11 @@ class Validator:
 
         for ip in self.cimc_address:
             logger.info("Start SSH Connection Validate for {}, timeout 5 minustes".format(ip))
-            connection_state = check_ssh_connection(ip, self.apic_cimc_credential[0], self.apic_cimc_credential[1])
+            connection_state = check_ssh_connection(
+                ip,
+                self.apic_cimc_credential[0],
+                self.apic_cimc_credential[1]
+            )
             if not connection_state:
                 apic_fail_list.append(ip)
 
@@ -240,10 +266,15 @@ class Validator:
                 # Totally run 900 seconds every 3 seconds test if APIC could AAA login.
                 if time.time() - start_time >= 900:
                     break
-                connection_state = apic_login(ip, self.aci_local_credential[0], self.aci_local_credential[1])
+                connection_state = apic_login(
+                    ip,
+                    self.aci_local_credential[0],
+                    self.aci_local_credential[1]
+                )
                 if not connection_state:
                     apic_fail_list.append(ip)
-                    logger.info("Attempt to validate {} APIC AAA Login Connection {}th, timeout 15 min.".format(ip, i))
+                    logger.info("Attempt to validate {} APIC AAA Login Connection {}th, timeout 15 min."
+                                .format(ip, i))
                     i += 1
                     time.sleep(3)
                 else:
