@@ -152,8 +152,8 @@ class Validator:
             return True
 
     def _validate_ip(self):
-        pattern = '^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.)' \
-                  '{3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$'
+        pattern = r'^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.)' \
+                  r'{3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$'
         fail_ip_list = []
         if self.total_ip_list:
             msg = "Validate Error: " \
