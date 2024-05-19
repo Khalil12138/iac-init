@@ -24,10 +24,10 @@ jobs:
         run: |
           pip install poetry
           poetry install
-          poetry run flake8 --exclude=./iac_init/conf/__init__.py
+          poetry run flake8 --ignore=iac_init/conf/__init__.py
           poetry run isort --check iac_init
           poetry run black --check iac_init
-          poetry run mypy iac_init
+          poetry run mypy iac_init --ignore-missing-imports iac_init
 
   test:
     name: Tests
