@@ -7,6 +7,7 @@ from iac_init.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "IAC_INIT_SETTINGS_MODULE"
 
+
 class SettingsReference(str):
     """
     String subclass which references a current settings value. It's treated as
@@ -18,6 +19,7 @@ class SettingsReference(str):
 
     def __init__(self, value, setting_name):
         self.setting_name = setting_name
+
 
 class LazySettings(LazyObject):
     def _setup(self, name=None):
@@ -31,10 +33,6 @@ class LazySettings(LazyObject):
             self._setup(name)
             _wrapped = self._wrapped
         val = getattr(self._wrapped, name)
-
-        # Special case some settings which require further modification.
-        # This is done here for performance reasons so the modified value is cached.
-
         self.__dict__[name] = val
         return val
 
@@ -54,11 +52,12 @@ class LazySettings(LazyObject):
         super().__delattr__(name)
         self.__dict__.pop(name, None)
 
+
 class Settings:
     def __init__(self):
-        # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
             if setting.isupper():
                 setattr(self, setting, getattr(global_settings, setting))
+
 
 settings = LazySettings()
