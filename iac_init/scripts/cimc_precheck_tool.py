@@ -78,7 +78,7 @@ def cimc_login(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
 
 def cimc_logout(CIMC_IP, token):
     try:
-        data = f"<aaaLogout cookie='{token}' inCookie='{token}'> </aaaLogout>"
+        data = f"<aaaLogout cookie='{token}'inCookie='{token}'> </aaaLogout>"
         cimc_api(CIMC_IP, data)
         logger.info(f"Logout {token} successfully!")
 
@@ -98,7 +98,8 @@ def cimc_health_check(CIMC_IP, token):
         firmware_response = cimc_api(CIMC_IP, firmware_data)
         logger.info(firmware_response.text)
         firmware_version = ET.fromstring(
-            firmware_response.text).find('.//firmwareRunning').attrib['version']
+            firmware_response.text).find(
+            './/firmwareRunning').attrib['version']
         logger.info(f"Current Firmware version is: {firmware_version}")
 
         fault_data = f'''
@@ -151,7 +152,7 @@ def cimc_mapping_clean(CIMC_IP, token):
             <!-- CIMC mapping clear -->
             <configConfMo cookie="{token}"><inConfig>
                 <commVMediaMap
-                dn="sys/svc-ext/vmedia-svc/vmmap-{existing_mapping}" 
+                dn="sys/svc-ext/vmedia-svc/vmmap-{existing_mapping}"
                 volumeName="{existing_mapping}"
                 status='removed' ></commVMediaMap>
             </inConfig></configConfMo>
@@ -181,7 +182,7 @@ def cimc_mapping_clean(CIMC_IP, token):
             <!-- CIMC boot order clear -->
             <configConfMo cookie="{token}"><inConfig>
                 <lsbootVMedia
-                dn="sys/rack-unit-1/boot-precision/vm-{existing_bootorder}" 
+                dn="sys/rack-unit-1/boot-precision/vm-{existing_bootorder}"
                 name="{existing_bootorder}" status='removed' ></lsbootVMedia>
             </inConfig></configConfMo>
             '''
