@@ -19,8 +19,14 @@ logger.add(
 )
 
 
-class TelnetClient():
-    def __init__(self, telnet_ip, telnet_port, telnet_username, telnet_password):
+class TelnetClient:
+    def __init__(
+            self,
+            telnet_ip,
+            telnet_port,
+            telnet_username,
+            telnet_password
+    ):
         self.tn = telnetlib.Telnet()
         self.host_ip = telnet_ip
         self.port = telnet_port
@@ -33,7 +39,8 @@ class TelnetClient():
 
         except:
             logger.warning(
-                '{}:{} Network Connection Issue'.format(self.host_ip, self.port)
+                '{}:{} Network Connection Issue'
+                .format(self.host_ip, self.port)
             )
             self.tn.close()
             return False
@@ -42,11 +49,13 @@ class TelnetClient():
         self.tn.read_until(b'Password: ', timeout=10)
         self.tn.write(self.password.encode('ascii') + b'\n')
         time.sleep(2)
-        command_result = self.tn.read_very_eager().decode('ascii')
+        command_result = self.tn.read_very_eager()\
+            .decode('ascii')
         print(command_result)
         if '#' in command_result:
             logger.info(
-                '{}:{} Login Success!!'.format(self.host_ip, self.port)
+                '{}:{} Login Success!!'
+                .format(self.host_ip, self.port)
             )
             self.tn.close()
             return True
