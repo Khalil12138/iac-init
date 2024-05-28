@@ -15,7 +15,7 @@ from iac_init.yaml_conf.yaml import load_yaml_files
 from iac_init.scripts.ssh_tool import check_ssh_connection
 from iac_init.scripts.apic_connecton_tool import apic_login
 from iac_init.scripts.cimc_precheck_tool import cimc_precheck
-from iac_init.scripts.telnet_tool import check_tennet_connection
+from iac_init.scripts.telnet_tool import TelnetClient
 
 logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR,
            'iac_init_log', 'iac-init-main.log'),
@@ -226,7 +226,15 @@ class Validator:
         switch_fail_list = []
 
         for data in self.switch_list:
-            connection_state = check_tennet_connection(data[0], data[1])
+            logger.info("Start Telnet Connection Validate for {}:{}"
+                        .format(data[0], data[1]))
+            connection = TelnetClient(
+                data[0],
+                data[1],
+                self.aci_local_credential[0],
+                self.aci_local_credential[1]
+            )
+            connection_state = connection.login_host()
             if not connection_state:
                 switch_fail_list.append("{}:{}".format(data[0], data[1]))
 
