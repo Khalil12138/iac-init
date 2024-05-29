@@ -252,7 +252,7 @@ def main(
                 logger.error(msg)
                 exit()
 
-        else:
+        elif int(option) in [3]:
             error = validator.validate_apic_aaa_connection()
             if error:
                 exit()
@@ -261,7 +261,7 @@ def main(
             )
             if not yaml_path:
                 exit()
-            option_yaml_path = validator.validate_yaml_exist(
+            option_yaml_path = validator.validate_yaml_dir_exist(
                 settings.DATA_PATH[int(option)-1]
             )
             if not option_yaml_path:
@@ -287,9 +287,10 @@ def main(
                         dir_path,
                         settings.DATA_PATH[int(option)-1]
                     )
-                    shutil.copy(option_yaml_path, yaml_cp_output_path)
-                    logger.info("Copied Yaml file to {} success."
-                                .format(yaml_cp_output_path))
+                    for oyp in option_yaml_path:
+                        shutil.copy(oyp, yaml_cp_output_path)
+                        logger.info("Copied Yaml {} to {} success."
+                                    .format(oyp, yaml_cp_output_path))
             except Exception as e:
                 msg = "Generate working directory fail, detail: {}"\
                     .format(e)

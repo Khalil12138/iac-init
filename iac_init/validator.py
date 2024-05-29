@@ -318,6 +318,7 @@ class Validator:
         self.options = value
         return self.choices
 
+    # This function is used for option 1 and 2.
     def validate_yaml_exist(self, yamlfile):
         for dir, _, files in os.walk(self.data_path):
             for filename in files:
@@ -327,6 +328,29 @@ class Validator:
             return self.yaml_path
         else:
             msg = "Vlidate Error: Yaml File {} not fount".format(yamlfile)
+            logger.error(msg)
+            self.errors.append(msg)
+            return False
+
+    # This function is used for option 3.
+    def validate_yaml_dir_exist(self, yaml_dir):
+        try:
+            file_dir_list = []
+            for dir, _, files in os.walk(os.path.join(self.data_path, yaml_dir)):
+                for filename in files:
+                    option3_yaml_path = os.path.join(dir, filename)
+                    if option3_yaml_path:
+                        file_dir_list.append(option3_yaml_path)
+
+            if file_dir_list:
+                return file_dir_list
+            else:
+                msg = "Vlidate Error: No file fount in dir: {}".format(self.data_path, yaml_dir)
+                logger.error(msg)
+                self.errors.append(msg)
+                return False
+        except Exception as e:
+            msg = "Vlidate Error: {}".format(e)
             logger.error(msg)
             self.errors.append(msg)
             return False
