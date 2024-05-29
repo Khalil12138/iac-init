@@ -11,7 +11,7 @@ from loguru import logger
 from typing import Any, Dict, List, Optional
 
 from iac_init.conf import settings
-from iac_init.yaml_conf.yaml import load_yaml_files
+from iac_init.yaml_conf.iac_yaml import load_yaml_files
 from iac_init.scripts.ssh_tool import check_ssh_connection
 from iac_init.scripts.apic_connecton_tool import apic_login
 from iac_init.scripts.cimc_precheck_tool import cimc_precheck

@@ -7,7 +7,7 @@ import os
 import pathlib
 import shutil
 
-from . import yaml
+from . import iac_yaml
 from loguru import logger
 from typing import Any, Dict, List
 from jinja2 import ChainableUndefined, Environment, FileSystemLoader
@@ -27,7 +27,7 @@ class YamlWriter:
         data_paths: List[str],
     ) -> None:
         logger.info("Loading yaml files from {}".format(data_paths[0]))
-        self.data = yaml.load_yaml_files(data_paths)
+        self.data = iac_yaml.load_yaml_files(data_paths)
         self.filters: Dict[str, Any] = {}
 
     def render_template(
