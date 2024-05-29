@@ -285,7 +285,7 @@ def main(
                 if os.path.exists(dir_path) and os.path.isdir(dir_path):
                     yaml_cp_output_path = os.path.join(
                         dir_path,
-                        settings.DATA_PATH[int(option)-1]
+                        'data.yaml'
                     )
                     for oyp in option_yaml_path:
                         shutil.copy(oyp, yaml_cp_output_path)
