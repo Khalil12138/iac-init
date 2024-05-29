@@ -284,11 +284,16 @@ def main(
                 )
                 if os.path.exists(dir_path) and os.path.isdir(dir_path):
                     yaml_cp_output_path = os.path.join(
-                        dir_path,
-                        'data.yaml'
+                        dir_path
                     )
                     for oyp in option_yaml_path:
-                        shutil.copy(oyp, yaml_cp_output_path)
+                        shutil.copy(
+                            oyp,
+                            os.path.join(
+                                yaml_cp_output_path,
+                                os.path.basename(oyp)
+                            )
+                        )
                         logger.info("Copied Yaml {} to {} success."
                                     .format(oyp, yaml_cp_output_path))
             except Exception as e:
