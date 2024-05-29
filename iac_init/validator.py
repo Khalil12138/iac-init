@@ -237,6 +237,8 @@ class Validator:
             connection_state = connection.login_host()
             if not connection_state:
                 switch_fail_list.append("{}:{}".format(data[0], data[1]))
+            else:
+                connection.logout_host()
 
         if apic_fail_list and switch_fail_list:
             apic_error_msg += ",".join(apic_fail_list)

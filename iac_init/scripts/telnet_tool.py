@@ -66,3 +66,6 @@ class TelnetClient:
             )
             self.tn.close()
             return False
+
+    def logout_host(self):
+        self.tn.write(b"exit\n")
