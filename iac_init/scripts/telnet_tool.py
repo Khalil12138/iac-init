@@ -57,6 +57,7 @@ class TelnetClient:
                 '{}:{} Login Success!!'
                 .format(self.host_ip, self.port)
             )
+            self.tn.write(b"exit\n")
             self.tn.close()
             return True
         else:
@@ -67,5 +68,3 @@ class TelnetClient:
             self.tn.close()
             return False
 
-    def logout_host(self):
-        self.tn.write(b"exit\n")
