@@ -345,7 +345,8 @@ class Validator:
             if file_dir_list:
                 return file_dir_list
             else:
-                msg = "Vlidate Error: No file fount in dir: {}".format(self.data_path, yaml_dir)
+                msg = "Vlidate Error: No file fount in dir: {}"\
+                    .format(os.path.join(self.data_path, yaml_dir))
                 logger.error(msg)
                 self.errors.append(msg)
                 return False
