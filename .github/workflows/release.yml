@@ -9,11 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install dependencies and Encryption code
-        run: |
-          pip install jmpy3
-          jmpy -i .
       - name: Publish
         env:
           POETRY_HTTP_BASIC_PYPI_USERNAME: __token__
