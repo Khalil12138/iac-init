@@ -44,14 +44,6 @@ class TelnetClient:
             )
             self.tn.close()
             return False
-        if self.tn.read_until(b'#', timeout=10):
-            logger.info(
-                '{}:{} Login Success!!'
-                .format(self.host_ip, self.port)
-            )
-            self.tn.write(b"exit\n")
-            self.tn.close()
-            return True
 
         self.tn.read_until(b'login: ', timeout=10)
         self.tn.write(self.username.encode('ascii') + b'\n')
@@ -61,7 +53,7 @@ class TelnetClient:
         command_result = self.tn.read_very_eager()\
             .decode('ascii')
         print(command_result)
-        if '#' in command_result:
+        if 'Login incorrect' not in command_result:
             logger.info(
                 '{}:{} Login Success!!'
                 .format(self.host_ip, self.port)
@@ -76,4 +68,3 @@ class TelnetClient:
             )
             self.tn.close()
             return False
-
