@@ -336,17 +336,25 @@ class Validator:
     def validate_yaml_dir_exist(self, yaml_dir):
         try:
             file_dir_list = []
-            for dir, _, files in os.walk(os.path.join(self.data_path, yaml_dir)):
-                for filename in files:
-                    option3_yaml_path = os.path.join(dir, filename)
-                    if option3_yaml_path:
-                        file_dir_list.append(option3_yaml_path)
+            folder_path = os.path.join(self.data_path, yaml_dir)
+            if os.path.exists(folder_path) and os.path.isdir(folder_path):
+                for dir, _, files in os.walk(folder_path):
+                    for filename in files:
+                        option3_yaml_path = os.path.join(dir, filename)
+                        if option3_yaml_path:
+                            file_dir_list.append(option3_yaml_path)
+            else:
+                msg = "Vlidate Error: Dir {} not exist"\
+                    .format(folder_path)
+                logger.error(msg)
+                self.errors.append(msg)
+                return False
 
             if file_dir_list:
                 return file_dir_list
             else:
                 msg = "Vlidate Error: No file fount in dir: {}"\
-                    .format(os.path.join(self.data_path, yaml_dir))
+                    .format(folder_path)
                 logger.error(msg)
                 self.errors.append(msg)
                 return False
