@@ -14,8 +14,6 @@ jobs:
           POETRY_HTTP_BASIC_PYPI_USERNAME: __token__
           POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.POETRY_HTTP_BASIC_PYPI_PASSWORD }}
         run: |
-          cd dist/iac-init
-          pwd
           keyring --disable
           pip install poetry
           poetry build
