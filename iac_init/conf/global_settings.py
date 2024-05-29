@@ -25,15 +25,15 @@ DATA_PATH = [
 ]
 
 TEMPLATE_DIR = [
-    os.path.join(BASE_DIR, "templates", "01-wipe_aci_fabric"),
-    os.path.join(BASE_DIR, "templates", "02-discover_apic"),
-    os.path.join(BASE_DIR, "templates", "03-nac-tasks"),
+    os.path.join(BASE_DIR, "templates", "01-fabric_bootstrap"),
+    os.path.join(BASE_DIR, "templates", "02-apic_init"),
+    os.path.join(BASE_DIR, "templates", "03-nac_tasks"),
 ]
 
 OUTPUT_DIR = [
-    os.path.join(OUTPUT_BASE_DIR, "01-wipe_aci_fabric"),
-    os.path.join(OUTPUT_BASE_DIR, "02-discover_apic"),
-    os.path.join(OUTPUT_BASE_DIR, "03-nac-tasks"),
+    os.path.join(OUTPUT_BASE_DIR, "01-fabric_bootstrap"),
+    os.path.join(OUTPUT_BASE_DIR, "02-apic_init"),
+    os.path.join(OUTPUT_BASE_DIR, "03-nac_tasks"),
 ]
 
 os.environ["iac_init_option_1"] = OUTPUT_DIR[0]
