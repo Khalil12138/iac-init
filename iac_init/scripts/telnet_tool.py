@@ -44,8 +44,15 @@ class TelnetClient:
             )
             self.tn.close()
             return False
-        self.tn.read_until(b'#', timeout=10)
-        self.tn.write(b"exit\n")
+        if self.tn.read_until(b'#', timeout=10):
+            logger.info(
+                '{}:{} Login Success!!'
+                .format(self.host_ip, self.port)
+            )
+            self.tn.write(b"exit\n")
+            self.tn.close()
+            return True
+
         self.tn.read_until(b'login: ', timeout=10)
         self.tn.write(self.username.encode('ascii') + b'\n')
         self.tn.read_until(b'Password: ', timeout=10)
