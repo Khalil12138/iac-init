@@ -284,18 +284,16 @@ def main(
                 )
                 if os.path.exists(dir_path) and os.path.isdir(dir_path):
                     yaml_cp_output_path = os.path.join(
-                        dir_path
+                        dir_path,
+                        'data.yaml'
                     )
-                    for oyp in option_yaml_path:
-                        shutil.copy(
-                            oyp,
-                            os.path.join(
-                                yaml_cp_output_path,
-                                os.path.basename(oyp)
-                            )
-                        )
-                        logger.info("Copied Yaml {} to {} success."
-                                    .format(oyp, yaml_cp_output_path))
+                    result = validator.write_output(
+                        option_yaml_path,
+                        yaml_cp_output_path
+                    )
+                    if not result:
+                        exit()
+
             except Exception as e:
                 msg = "Generate working directory fail, detail: {}"\
                     .format(e)

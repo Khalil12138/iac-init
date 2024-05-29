@@ -5,7 +5,7 @@
 import os
 import re
 import time
-import yaml
+from ruamel import yaml
 
 from loguru import logger
 from typing import Any, Dict, List, Optional
@@ -335,14 +335,14 @@ class Validator:
     # This function is used for option 3.
     def validate_yaml_dir_exist(self, yaml_dir):
         try:
-            file_dir_list = []
+            self.file_dir_list = []
             folder_path = os.path.join(self.data_path, yaml_dir)
             if os.path.exists(folder_path) and os.path.isdir(folder_path):
                 for dir, _, files in os.walk(folder_path):
                     for filename in files:
                         option3_yaml_path = os.path.join(dir, filename)
                         if option3_yaml_path:
-                            file_dir_list.append(option3_yaml_path)
+                            self.file_dir_list.append(option3_yaml_path)
             else:
                 msg = "Validate Error: Directory {} not exist."\
                     .format(folder_path)
@@ -350,8 +350,8 @@ class Validator:
                 self.errors.append(msg)
                 return False
 
-            if file_dir_list:
-                return file_dir_list
+            if self.file_dir_list:
+                return self.file_dir_list
             else:
                 msg = "Validate Error: No file fount in dir: {}"\
                     .format(folder_path)
@@ -391,3 +391,17 @@ class Validator:
             pass
         else:
             exit(1)
+
+    def write_output(self, input_paths: List[str], path: str):
+        if self.data is None:
+            self.data = load_yaml_files(input_paths)
+        try:
+            with open(path, "w") as fh:
+                y = yaml.YAML()
+                y.default_flow_style = False
+                y.dump(self.data, fh)
+            return True
+
+        except:
+            logger.error("Cannot write file: {}".format(path))
+            return False
