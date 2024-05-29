@@ -327,7 +327,7 @@ class Validator:
         if self.yaml_path:
             return self.yaml_path
         else:
-            msg = "Vlidate Error: Yaml File {} not fount".format(yamlfile)
+            msg = "Validate Error: Yaml File {} not fount".format(yamlfile)
             logger.error(msg)
             self.errors.append(msg)
             return False
@@ -344,7 +344,7 @@ class Validator:
                         if option3_yaml_path:
                             file_dir_list.append(option3_yaml_path)
             else:
-                msg = "Vlidate Error: Dir {} not exist"\
+                msg = "Validate Error: Directory {} not exist."\
                     .format(folder_path)
                 logger.error(msg)
                 self.errors.append(msg)
@@ -353,13 +353,13 @@ class Validator:
             if file_dir_list:
                 return file_dir_list
             else:
-                msg = "Vlidate Error: No file fount in dir: {}"\
+                msg = "Validate Error: No file fount in dir: {}"\
                     .format(folder_path)
                 logger.error(msg)
                 self.errors.append(msg)
                 return False
         except Exception as e:
-            msg = "Vlidate Error: {}".format(e)
+            msg = "Validate Error: {}".format(e)
             logger.error(msg)
             self.errors.append(msg)
             return False
