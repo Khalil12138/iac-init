@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
+# Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
 
 import os
 import re
@@ -18,7 +18,7 @@ from iac_init.scripts.cimc_precheck_tool import cimc_precheck
 from iac_init.scripts.telnet_tool import TelnetClient
 
 logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR,
-           'iac_init_log', 'iac-init-main.log'),
+           'iac_init_log', 'iac_init_main.log'),
            format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}',
            encoding='utf-8')
 
@@ -33,23 +33,23 @@ class Validator:
         self._wrapped = self._validate_path
 
     def _validate_path(self):
-        '''Validate if user provided yaml directory exist'''
+        '''Validate if user provided YAML directory exists'''
         if os.path.exists(self.data_path):
             if os.path.isdir(self.data_path):
                 pass
             else:
-                msg = "Yaml Directory must be a directory not a file.: {}"\
+                msg = "YAML directory must be a directory not a file: {}"\
                     .format(self.data_path)
                 logger.error(msg)
                 self.errors.append(msg)
                 return True
         else:
-            msg = "Yaml Directory not exist.: {}".format(self.data_path)
+            msg = "YAML Directory doesn't exist: {}".format(self.data_path)
             logger.error(msg)
             self.errors.append(msg)
             return True
 
-        logger.info("Loaded Yaml directory: {}".format(self.data_path))
+        logger.info("Loaded YAML directory: {}".format(self.data_path))
 
         return self._validate_yaml()
 
@@ -59,7 +59,7 @@ class Validator:
         if os.path.isfile(file_path) \
                 and \
                 (".yaml" in filename or ".yml" in filename):
-            logger.info("Validate file: {}".format(filename))
+            logger.info("Validated file: {} successfully.".format(filename))
 
             # YAML syntax validation
             try:
@@ -88,7 +88,7 @@ class Validator:
         if self.global_policy:
             settings.global_policy = load_yaml_files([self.global_policy])
         else:
-            msg = "Configuration File {} not fount"\
+            msg = "Configuration File {} is missing!"\
                 .format(settings.DEFAULT_DATA_PATH)
             logger.error(msg)
             self.errors.append(msg)
@@ -156,8 +156,8 @@ class Validator:
                   r'{3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$'
         fail_ip_list = []
         if self.total_ip_list:
-            msg = "Validate Error: " \
-                  "Below IP can not meet IP Address Format.\n"
+            msg = "Validation Error: " \
+                  "Below IP(s) can not meet IP Address Format!\n"
             for ip in self.total_ip_list:
                 p = re.compile(pattern)
                 if not p.match(ip):
@@ -171,7 +171,7 @@ class Validator:
             else:
                 return self._validate_image_version()
         else:
-            msg = "Validate error: Pls provide APIC/Switch IP configuration"
+            msg = "Validation error: APIC/Switch IP configuration is missing!"
             logger.error(msg)
             self.errors.append(msg)
             return True
@@ -187,20 +187,20 @@ class Validator:
 
             if image32 == image64:
                 if not image32.endswith(".bin"):
-                    msg = "Validate error: Image name must end with .bin."
+                    msg = "Validation error: Image name must end with .bin."
                     logger.error(msg)
                     return True
             else:
                 if not re.match(pattern_32, image32).group(1) == \
                        re.match(pattern_64, image64).group(1):
-                    msg = "Validate error: switch_image32 and " \
-                          "switch_image64 checking failed."
+                    msg = "Validation error: switch_image32 and " \
+                          "switch_image64 are not in same release!"
                     logger.error(msg)
                     return True
 
         except Exception as e:
-            msg = "Validate error: Yaml configuration switch_image32 and " \
-                  "switch_image64 checking failed."
+            msg = "Validation error: YAML configuration switch_image32 and " \
+                  "switch_image64 checking failed!"
             logger.error(msg)
             msg = e
             logger.error(msg)
@@ -208,12 +208,12 @@ class Validator:
             return True
 
     def validate_ssh_telnet_connection(self):
-        apic_error_msg = "Validate error: APIC CIMC SSH Fail.\n"
+        apic_error_msg = "Validation error: APIC CIMC SSH failed!\n"
         apic_fail_list = []
 
         for ip in self.cimc_address:
-            logger.info("Start SSH Connection Validate for {}, "
-                        "timeout 5 minustes".format(ip))
+            logger.info("Start SSH connection validation for {}, "
+                        "timeout 5 minutes".format(ip))
             connection_state = check_ssh_connection(
                 ip,
                 self.apic_cimc_credential[0],
@@ -222,11 +222,11 @@ class Validator:
             if not connection_state:
                 apic_fail_list.append(ip)
 
-        switch_error_msg = "Validate error: Switch Telnet Fail.\n"
+        switch_error_msg = "Validation error: Switch Telnet failed!\n"
         switch_fail_list = []
 
         for data in self.switch_list:
-            logger.info("Start Telnet Connection Validate for {}:{}"
+            logger.info("Start Telnet connection validation for {}:{}"
                         .format(data[0], data[1]))
             connection = TelnetClient(
                 data[0],
@@ -260,12 +260,14 @@ class Validator:
             self.errors.append(switch_error_msg)
             return True
 
-        logger.info("APIC CIMC SSH Connection and "
-                    "Switch Telnet Connection Success.")
+        logger.info("APIC CIMC SSH connection and "
+                    "Switch Telnet connection validate successfully.")
         return
 
     def validate_apic_aaa_connection(self):
-        apic_error_msg = "Validate error: APIC AAA Login Fail.\n"
+        # Rudy: Need to update AAA login code later
+        # (it's default domain at this moment)
+        apic_error_msg = "Validatation error: APIC Login failed!\n"
         apic_fail_list = []
 
         for ip in self.apic_address:
@@ -291,15 +293,15 @@ class Validator:
                 if not connection_state:
                     apic_fail_list.append(ip)
                     logger.info("Attempt to validate {} "
-                                "APIC AAA Login Connection {}th,"
-                                " timeout 15 min."
+                                "APIC Login Connection {}th,"
+                                " timeout 15 mins."
                                 .format(ip, i))
                     i += 1
                     time.sleep(3)
                 else:
                     break
 
-        logger.info("APIC AAA Login Connection Success.")
+        logger.info("APIC Login validates successfully.")
         return
 
     def validate_choices(self, value):
@@ -310,7 +312,7 @@ class Validator:
                              )
         for choice in choices:
             if choice not in valid_choices:
-                msg = '{} is not a valid choice'.format(choice)
+                msg = '{} is not a valid choice!'.format(choice)
                 logger.error(msg)
                 self.errors.append(msg)
                 return
@@ -319,15 +321,18 @@ class Validator:
         return self.choices
 
     # This function is used for option 1 and 2.
+    # Rudy: seems this is used for all options
     def validate_yaml_exist(self, yamlfile):
         for dir, _, files in os.walk(self.data_path):
             for filename in files:
                 if yamlfile == filename:
                     self.yaml_path = os.path.join(dir, filename)
         if self.yaml_path:
+            msg = "YAML file {} validated successfully.".format(yamlfile)
+            logger.info(msg)
             return self.yaml_path
         else:
-            msg = "Validate Error: Yaml File {} not fount".format(yamlfile)
+            msg = "Validation error: YAML file {} is missing!".format(yamlfile)
             logger.error(msg)
             self.errors.append(msg)
             return False
@@ -344,7 +349,7 @@ class Validator:
                         if option3_yaml_path:
                             self.file_dir_list.append(option3_yaml_path)
             else:
-                msg = "Validate Error: Directory {} not exist."\
+                msg = "Validation Error: Directory {} doesn't exist!"\
                     .format(folder_path)
                 logger.error(msg)
                 self.errors.append(msg)
@@ -353,13 +358,13 @@ class Validator:
             if self.file_dir_list:
                 return self.file_dir_list
             else:
-                msg = "Validate Error: No file fount in dir: {}"\
+                msg = "Validation Error: No file found in dir: {}"\
                     .format(folder_path)
                 logger.error(msg)
                 self.errors.append(msg)
                 return False
         except Exception as e:
-            msg = "Validate Error: {}".format(e)
+            msg = "Validation Error: {}".format(e)
             logger.error(msg)
             self.errors.append(msg)
             return False
@@ -375,11 +380,11 @@ class Validator:
         result_state = True
         for cimc_ip, test_result in result.items():
             if test_result:
-                msg = "{} pre-check success\n".format(cimc_ip)
+                msg = "APIC CIMC {} pre-check successfully.\n".format(cimc_ip)
                 logger.info(msg)
             else:
                 result_state = False
-                msg = "{} pre-check fail\n".format(cimc_ip)
+                msg = "APIC CIMC {} pre-check failed!\n".format(cimc_ip)
                 logger.error(msg)
 
         if result_state:

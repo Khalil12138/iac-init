@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
+# Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
 
 import json
 import os
@@ -13,11 +13,12 @@ from typing import Any, Dict, List
 from jinja2 import ChainableUndefined, Environment, FileSystemLoader
 from iac_init.conf import settings
 
+# Rudy: need to check log setting
 logger.add(
     sink=os.path.join(
         settings.OUTPUT_BASE_DIR,
         'iac_init_log',
-        'iac-init-main.log'),
+        'iac_init_main.log'),
     format="{time} {level} {message}", level="INFO")
 
 
@@ -26,7 +27,7 @@ class YamlWriter:
         self,
         data_paths: List[str],
     ) -> None:
-        logger.info("Loading yaml files from {}".format(data_paths[0]))
+        logger.info("Loading YAML files from {}".format(data_paths[0]))
         self.data = yaml.load_yaml_files(data_paths)
         self.filters: Dict[str, Any] = {}
 
@@ -38,7 +39,7 @@ class YamlWriter:
             **kwargs: Any
     ) -> None:
         """Render single robot jinja template"""
-        logger.info("Render ansible playbook template: {}"
+        logger.info("Render Ansible playbook template: {}"
                     .format(template_path))
         # create output directory if it does not exist yet
         pathlib.Path(os.path.dirname(output_path))\
@@ -119,7 +120,7 @@ class YamlWriter:
 
                         self.o_path = os.path.join(o_dir, filename)
                         self.render_template(t_path, self.o_path, env)
-                        logger.info("Generate working file success: {}"
+                        logger.info("Generate working file successfully: {}"
                                     .format(self.o_path))
                 except Exception as e:
                     logger.error("Generate working file failed: {}"
@@ -134,7 +135,7 @@ class YamlWriter:
                         output_path, os.path.basename(templates_path), rel
                     )
                     pathlib.Path(self.o_dir).mkdir(parents=True, exist_ok=True)
-                    logger.info("Generate working directory success: {}"
+                    logger.info("Generate working directory successfully: {}"
                                 .format(self.o_dir))
                 except Exception as e:
                     logger.error("Generate working directory failed: {}"

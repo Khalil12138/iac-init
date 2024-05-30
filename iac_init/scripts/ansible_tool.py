@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
+# Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
 
 import re
 import os
@@ -20,7 +20,7 @@ def ansible_deploy_function(
     log_formatter = logging.Formatter('%(message)s')
     log_file = os.path.join(settings.OUTPUT_BASE_DIR,
                             'iac_init_log',
-                            'iac-init-{}-{}.log'.format(option, step_name))
+                            'iac_init_{}_{}.log'.format(option, step_name))
     file_handler = RotatingFileHandler(
         log_file,
         maxBytes=30*1024*1024,
@@ -44,7 +44,7 @@ def ansible_deploy_function(
                  event_handler=callback)
 
     if runner.status == "successful":
-        logger.info("Successfully finish Step {}: {}"
+        logger.info("Successfully finished Step {}: {}"
                     .format(option, step_name.upper()))
         return True
 

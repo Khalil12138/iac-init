@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
+# Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
 
 import os
 import time
@@ -8,11 +8,12 @@ import telnetlib
 from loguru import logger
 from iac_init.conf import settings
 
+# Rudy: need to check log setting
 logger.add(
     sink=os.path.join(
         settings.OUTPUT_BASE_DIR,
         'iac_init_log',
-        'iac-init-main.log'
+        'iac_init_main.log'
     ),
     format="{time} {level} {message}",
     level="INFO"
@@ -38,8 +39,8 @@ class TelnetClient:
             self.tn.open(self.host_ip, self.port)
 
         except:
-            logger.warning(
-                '{}:{} Network Connection Issue'
+            logger.error(
+                '{}:{} connected failed!'
                 .format(self.host_ip, self.port)
             )
             self.tn.close()
@@ -52,18 +53,18 @@ class TelnetClient:
         time.sleep(2)
         command_result = self.tn.read_very_eager()\
             .decode('ascii')
-        print(command_result)
+        # print(command_result)
         if 'Login incorrect' not in command_result:
             logger.info(
-                '{}:{} Login Success!!'
+                'Login {}:{} successfully.'
                 .format(self.host_ip, self.port)
             )
             self.tn.write(b"exit\n")
             self.tn.close()
             return True
         else:
-            logger.warning(
-                '{}:{} Login Failed wrong username or password'
+            logger.error(
+                'Login {}:{} failed due to wrong username or password!'
                 .format(self.host_ip, self.port)
             )
             self.tn.close()

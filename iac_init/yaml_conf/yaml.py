@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
+# Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
 
 import os
 import subprocess
@@ -11,11 +11,12 @@ from ruamel import yaml
 from loguru import logger
 from iac_init.conf import settings
 
+# Rudy: need to check log setting
 logger.add(
     sink=os.path.join(
         settings.OUTPUT_BASE_DIR,
         'iac_init_log',
-        'iac-init-main.log'
+        'iac_init_main.log'
     ),
     format="{time} {level} {message}",
     level="INFO"
@@ -72,7 +73,7 @@ class EnvTag(yaml.YAMLObject):
 
 
 def load_yaml_files(paths: List[str]) -> Dict[str, Any]:
-    """Load all yaml files from a provided directory."""
+    """Load all YAML files from a provided directory."""
 
     def _load_file(file_path: str, data: Dict[str, Any]) -> None:
         with open(file_path, "r") as file:
@@ -104,7 +105,7 @@ def load_yaml_files(paths: List[str]) -> Dict[str, Any]:
 def merge_list_item(
     source_item: Any, destination: List[Any], merge_list_items: bool = True
 ) -> None:
-    """Merge item into list."""
+    """Merge items into list."""
     if isinstance(source_item, dict) and merge_list_items:
         # check if we have an item in destination with matching primitives
         for dest_item in destination:

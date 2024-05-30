@@ -1,5 +1,8 @@
-import threading
+# -*- coding: utf-8 -*-
 
+# Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
+
+import threading
 
 class MyThread(threading.Thread):
     def __init__(self, target, args=()):

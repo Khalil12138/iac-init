@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Rudy Lei <shlei@cisco.com>
-
-# This is for APIC CIMC pre check,
-# run this pre check when option 1 is selected,
-# apply this for all APICs.
-
+# Copyright: (c) 2024, Rudy Lei <shlei@cisco.com>
 
 import os
 import re
@@ -16,11 +11,12 @@ import xml.etree.ElementTree as ET
 from loguru import logger
 from iac_init.conf import settings
 
+# Rudy: need to check log setting
 logger.add(
     sink=os.path.join(
         settings.OUTPUT_BASE_DIR,
         'iac_init_log',
-        'iac-init-main.log'
+        'iac_init_main.log'
     ),
     format="{time} {level} {message}",
     level="INFO"
@@ -47,7 +43,7 @@ def cimc_api(CIMC_IP, data):
         if response.status_code == 200:
             return response
         else:
-            msg = f"Error: CIMC {CIMC_IP} Connection Fail!!"
+            msg = f"APIC CIMC {CIMC_IP} connected failed!"
             logger.error(msg)
             return False
     except Exception as e:
@@ -63,10 +59,10 @@ def cimc_login(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
         response = cimc_api(CIMC_IP, data)
         token = ET.fromstring(response.text).attrib['outCookie']
         if token:
-            logger.info(f"Login token: {token}")
+            logger.info(f"CIMC Login token: {token}")
             return token
         else:
-            msg = f"Error: CIMC {CIMC_IP} Login Fail!!"
+            msg = f"CIMC {CIMC_IP} Login failed!"
             logger.error(msg)
             return False
 
@@ -80,7 +76,7 @@ def cimc_logout(CIMC_IP, token):
     try:
         data = f"<aaaLogout cookie='{token}'inCookie='{token}'> </aaaLogout>"
         cimc_api(CIMC_IP, data)
-        logger.info(f"Logout {token} successfully!")
+        logger.info(f"Logout CIMC {CIMC_IP} with token {token} successfully.")
 
     except Exception as e:
         msg = "{}".format(e)
@@ -96,7 +92,7 @@ def cimc_health_check(CIMC_IP, token):
         dn="sys/rack-unit-1/mgmt/fw-system"/>
         '''
         firmware_response = cimc_api(CIMC_IP, firmware_data)
-        logger.info(firmware_response.text)
+        # logger.info(firmware_response.text)
         firmware_version = ET.fromstring(
             firmware_response.text).find(
             './/firmwareRunning').attrib['version']
@@ -117,13 +113,13 @@ def cimc_health_check(CIMC_IP, token):
         inHierarchical='false' classId='equipmentTpm'/>
         '''
         tpm_response = cimc_api(CIMC_IP, tpm_data)
-        logger.info(tpm_response.text)
+        # logger.info(tpm_response.text)
         tpm_status = ET.fromstring(tpm_response.text).find(
             './/equipmentTpm').attrib['enabledStatus']
         logger.info(f"Current TPM status is: {tpm_status}")
 
         if "enable" not in tpm_status:
-            logger.error("TPM is not enabled!!")
+            logger.error(f"CIMC {CIMC_IP}: TPM is not enabled!")
             return False
 
         return True
@@ -142,7 +138,7 @@ def cimc_mapping_clean(CIMC_IP, token):
         inHierarchical='false' classId='commVMediaMap'/>
         '''
         cimc_mapping_response = cimc_api(CIMC_IP, cimc_mapping_data)
-        logger.info(cimc_mapping_response.text)
+        # logger.info(cimc_mapping_response.text)
         if re.search(r'commVMediaMap volumeName', cimc_mapping_response.text):
             existing_mapping = ET.fromstring(
                 cimc_mapping_response.text).find(
@@ -172,7 +168,7 @@ def cimc_mapping_clean(CIMC_IP, token):
         inHierarchical='false' classId='lsbootVMedia'/>
         '''
         cimc_boot_data_response = cimc_api(CIMC_IP, cimc_boot_data)
-        logger.info(cimc_boot_data_response.text)
+        # logger.info(cimc_boot_data_response.text)
         if re.search(r'lsbootVMedia name', cimc_boot_data_response.text):
             existing_bootorder = ET.fromstring(
                 cimc_boot_data_response.text).find(
@@ -232,7 +228,7 @@ def cimc_precheck(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
         token = cimc_login(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD)
         health_check_result = cimc_health_check(CIMC_IP, token)
         if not health_check_result:
-            logger.error("CIMC health check failed!!")
+            logger.error("CIMC health check failed!")
             return False
 
         logger.info("CIMC health check pass!")
@@ -242,10 +238,10 @@ def cimc_precheck(CIMC_IP, CIMC_USERNAME, CIMC_PASSWORD):
             token
         )
         if not cimc_mapping_clean_result:
-            logger.error("CIMC mapping clean failed!!")
+            logger.error("CIMC mapping clean failed!")
             return False
 
-        logger.info("CIMC mapping clean successfully!")
+        logger.info("CIMC mapping clean successfully.")
         logger.info("Powering down CIMC...")
         power_down_cimc(CIMC_IP, token)
         cimc_logout(CIMC_IP, token)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
+# Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
 
 import requests
 import os
@@ -9,11 +9,12 @@ import urllib3
 from loguru import logger
 from iac_init.conf import settings
 
+# Rudy: need to check log setting
 logger.add(
     sink=os.path.join(
         settings.OUTPUT_BASE_DIR,
         'iac_init_log',
-        'iac-init-main.log'
+        'iac_init_main.log'
     ),
     format="{time} {level} {message}",
     level="INFO"
@@ -46,7 +47,7 @@ def get_health_status(APIC_IP, token):
                 )
             for status in health_status:
                 if status != "fully-fit":
-                    msg = "Error: APIC {} Health Check fail(Not fully-fix)!!"\
+                    msg = "APIC {} Health Check failed(Not fully-fit)!"\
                         .format(APIC_IP)
                     logger.error(msg)
                     return False
@@ -58,7 +59,7 @@ def get_health_status(APIC_IP, token):
         logger.error(msg)
         return False
 
-
+# Rudy: discuss AAA domain later
 def apic_login(APIC_IP, APIC_USERNAME, APIC_PASSWORD):
     try:
         apic_login_url = f"https://{APIC_IP}/api/aaaLogin.json"
@@ -88,11 +89,11 @@ def apic_login(APIC_IP, APIC_USERNAME, APIC_PASSWORD):
             if token:
                 return get_health_status(APIC_IP, token)
             else:
-                msg = "Error: APIC {} Connection Fail!!".format(APIC_IP)
+                msg = "APIC {} connected failed(no token)!".format(APIC_IP)
                 logger.error(msg)
                 return False
         else:
-            msg = "Error: APIC {} Connection Fail!!".format(APIC_IP)
+            msg = "APIC {} connected failed(not 200 response)!".format(APIC_IP)
             logger.error(msg)
             return False
     except Exception as e:

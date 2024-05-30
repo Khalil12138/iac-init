@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
+# Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
 
 import os.path
 from pathlib import Path
@@ -27,18 +27,19 @@ DATA_PATH = [
 TEMPLATE_DIR = [
     os.path.join(BASE_DIR, "templates", "01-wipe_aci_fabric"),
     os.path.join(BASE_DIR, "templates", "02-discover_apic"),
-    os.path.join(BASE_DIR, "templates", "03-nac-tasks"),
+    os.path.join(BASE_DIR, "templates", "03-nac_tasks"),
 ]
 
 OUTPUT_DIR = [
     os.path.join(OUTPUT_BASE_DIR, "01-wipe_aci_fabric"),
     os.path.join(OUTPUT_BASE_DIR, "02-discover_apic"),
-    os.path.join(OUTPUT_BASE_DIR, "03-nac-tasks"),
+    os.path.join(OUTPUT_BASE_DIR, "03-nac_tasks"),
 ]
 
 os.environ["iac_init_option_1"] = OUTPUT_DIR[0]
 os.environ["iac_init_option_2"] = OUTPUT_DIR[1]
 
+# Rudy: sync the step name later
 ANSIBLE_STEP = [
     'iac-validate',
     'deploy',

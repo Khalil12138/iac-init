@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Wang Xiao <xiawang3@cisco.com>
+# Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
 
 import os
 import sys
@@ -25,7 +25,7 @@ error_handler = errorhandler.ErrorHandler()
 def main(
         data: str
 ) -> None:
-    """A CLI tool to perform APIC initialize."""
+    """A CLI tool to bootstrap and configure ACI fabric using ACI as Code."""
     output = settings.OUTPUT_BASE_DIR
 
     if os.path.exists(output) and os.path.isdir(output):
@@ -35,7 +35,7 @@ def main(
         sink=os.path.join(
             settings.OUTPUT_BASE_DIR,
             'iac_init_log',
-            'iac-init-main.log'
+            'iac_init_main.log'
         ),
         format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}',
         encoding='utf-8'
@@ -43,9 +43,9 @@ def main(
 
     validator = iac_init.validator.Validator(data, output)
 
-    # Type single number or multiple number (1,2...)
-    option_prompt = "Select single or multiple options " \
-                    "to init APIC:\n{}\nExample: (1,2,..)"\
+    # Type single number or multiple numbers (1,2...)
+    option_prompt = "Select single or multiple option(s) " \
+                    "to init ACI Fabric:\n{}\nExample: (1,2,..)"\
         .format("\n".join([f"[{i + 1}]  {option}" for i, option
                            in enumerate(settings.DEFAULT_USER_OPTIONS)]))
     option_choice = click.prompt(
@@ -54,8 +54,8 @@ def main(
     if not option_choice:
         exit()
 
-    # Type "yes" or "no" to preform APIC initiator
-    option_prompt = "\nAre you sure proceed init following Procedures!?\n{}\n"\
+    # Type "yes" or "no" to confirm
+    option_prompt = "\nAre you sure to proceed with following option(s)?\n{}\n"\
         .format("\n".join([f"[{i}]  {settings.DEFAULT_USER_OPTIONS[int(i)-1]}"
                            for i in option_choice]))
     option_proceed = click.prompt(
@@ -66,11 +66,12 @@ def main(
 
     error = validator._wrapped()
     if error:
+        logger.error("Option(s) validated failed, exiting...")
         exit()
-    logger.info("Initial Validation of Yamls Directory Success!!")
+    logger.info("Option(s) validated.")
 
     for option in option_choice:
-        logger.info("Start proceeding step {}.".format(option))
+        logger.info("Start processing step {}.".format(option))
         if int(option) in [1]:
             error = validator.validate_ssh_telnet_connection()
             if error:
@@ -83,6 +84,7 @@ def main(
             error = validator.validate_cimc_precheck()
             if error:
                 exit()
+            # Rudy: If only 1, this might not need to check
             option_yaml_path = validator.validate_yaml_exist(
                 settings.DATA_PATH[int(option)-1]
             )
@@ -91,8 +93,7 @@ def main(
             try:
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option) - 1], output)
-                logger.info("Generate Step {} working directory forder"
-                            " in {} Success!!"
+                logger.info("Generate step {} working directory in {} successfully."
                             .format(option, output))
 
                 dir_path = os.path.join(
@@ -104,7 +105,7 @@ def main(
                 if os.path.exists(dir_path) and os.path.isdir(dir_path):
                     yaml_cp_output_path = os.path.join(dir_path, 'main.yml')
                     shutil.copy(option_yaml_path, yaml_cp_output_path)
-                    logger.info("Copied Yaml file to {} success."
+                    logger.info("Copied switch YAML file to {} successfully."
                                 .format(yaml_cp_output_path))
 
                 dir_path = os.path.join(
@@ -116,11 +117,11 @@ def main(
                 if os.path.exists(dir_path) and os.path.isdir(dir_path):
                     yaml_cp_output_path = os.path.join(dir_path, 'main.yml')
                     shutil.copy(option_yaml_path, yaml_cp_output_path)
-                    logger.info("Copied Yaml file to {} success."
+                    logger.info("Copied APIC YAML file to {} successfully."
                                 .format(yaml_cp_output_path))
 
             except Exception as e:
-                msg = "Generate working directory fail, detail: {}".format(e)
+                msg = "Generate working directory failed.\nDetail: {}".format(e)
                 logger.error(msg)
                 exit()
 
@@ -158,8 +159,8 @@ def main(
                         True)
                 )
 
-                logger.info("Wipe aci fabric start pls wait, "
-                            "check log for detail.")
+                logger.info("ACI fabric bootstrap in progress, "
+                            "check APIC/switch logs for detail.")
 
                 thread1.start()
                 thread2.start()
@@ -168,17 +169,17 @@ def main(
                 thread2.join()
 
                 if thread1.get_result() and thread2.get_result():
-                    logger.info("Wipe aci fabric Success proceed.")
+                    logger.info("ACI fabric bootstrap is successfully.")
                 else:
                     logger.error(
-                        "Exist iac-init tool Step 1 failed "
-                        "pls check log for detail"
+                        "ACI fabric bootstrap failed, "
+                        "check APIC/switch logs for detail."
                     )
                     exit()
 
             except Exception as e:
-                msg = "Run Step 1 wipe aci fabric ansible-playbook" \
-                      " failed detail:\nError: {}".format(e)
+                msg = "Run Step 1 ACI fabric bootstrap ansible-playbook" \
+                      " failed.\nDetail: {}".format(e)
                 logger.error(msg)
                 exit()
 
@@ -200,7 +201,7 @@ def main(
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option)-1], output)
                 logger.info(
-                    "Generate Step {} working directory forder in {} Success!!"
+                    "Generate step {} working directory in {} successfully."
                     .format(option, output)
                 )
 
@@ -214,12 +215,12 @@ def main(
                     yaml_cp_output_path = os.path.join(dir_path, 'main.yml')
                     shutil.copy(option_yaml_path, yaml_cp_output_path)
                     logger.info(
-                        "Copied Yaml file to {} success."
+                        "Copied APIC YAML file to {} successfully."
                         .format(yaml_cp_output_path)
                     )
 
             except Exception as e:
-                msg = "Generate working directory fail, detail: {}".format(e)
+                msg = "Generate working directory failed.\nDetail: {}".format(e)
                 logger.error(msg)
                 exit()
 
@@ -238,17 +239,14 @@ def main(
                     quiet=False
                 )
                 if run_result:
-                    logger.info("Run step 2 APIC discovery "
-                                "ansible-playbook successfully.")
+                    logger.info("APIC init successfully.")
                 else:
-                    msg = "Run Step 2 APIC discovery ansible-playbook failed"
-                    logger.error(msg)
+                    logger.error("APIC init failed!")
                     exit()
 
             except Exception as e:
-                msg = "Run Step 2 APIC discovery " \
-                      "ansible-playbook fail detail:\nError: {}"\
-                    .format(e)
+                msg = "Run Step 2 APIC init ansible-playbook" \
+                      " failed.\nDetail: {}".format(e)
                 logger.error(msg)
                 exit()
 
@@ -273,7 +271,7 @@ def main(
                     output
                 )
                 logger.info(
-                    "Generate Step {} working directory forder in {} Success!!"
+                    "Generate step {} working directory in {} successfully."
                     .format(option, output)
                 )
                 dir_path = os.path.join(
@@ -295,7 +293,7 @@ def main(
                         exit()
 
             except Exception as e:
-                msg = "Generate working directory fail, detail: {}"\
+                msg = "Generate working directory failed.\nDetail: {}"\
                     .format(e)
                 logger.error(msg)
                 exit()
@@ -364,8 +362,8 @@ def main(
                     exit()
 
             except Exception as e:
-                msg = "Run NAC ansible-playbook fail detail:\nError: {}"\
-                    .format(e)
+                msg = "Run Step 3 NaC ansible-playbook" \
+                      " failed.\nDetail: {}".format(e)
                 logger.error(msg)
                 exit()
 
