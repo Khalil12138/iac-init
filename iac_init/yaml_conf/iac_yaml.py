@@ -82,8 +82,8 @@ def load_yaml_files(paths: List[str]) -> Dict[str, Any]:
                 y.preserve_quotes = True  # type: ignore
                 y.register_class(VaultTag)
                 y.register_class(EnvTag)
-                dict = y.load(data_yaml)
-                merge_dict(dict, data)
+                load_dict = y.load(data_yaml)
+                merge_dict(load_dict, data)
 
     result: Dict[str, Any] = {}
     for path in paths:
