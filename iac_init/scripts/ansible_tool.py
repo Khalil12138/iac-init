@@ -4,8 +4,12 @@
 
 import re
 import os
+import signal
 from ansible_runner import run
 from iac_init.conf import settings
+from iac_init.scripts.log_tool import log_tool
+
+main_logger = log_tool()
 
 
 def ansible_deploy_function(
@@ -37,18 +41,27 @@ def ansible_deploy_function(
             .sub('', res['stdout'])
         logger.info(output)
 
-    runner = run(playbook=playbook_dir,
-                 inventory=inventory_path,
-                 verbosity=5,
-                 quiet=True,
-                 event_handler=callback)
+    try:
+        runner = run(playbook=playbook_dir,
+                     inventory=inventory_path,
+                     verbosity=5,
+                     quiet=True,
+                     event_handler=callback)
 
-    if runner.status == "successful":
-        logger.info("Successfully finished Step {}: {}"
-                    .format(option, step_name.upper()))
-        return True
+        if runner.status == "successful":
+            main_logger.info("Successfully finished Step {}: {}"
+                             .format(option, step_name.upper()))
+            return True
 
-    else:
-        logger.error("Failed run Step {}: {}"
-                     .format(option, step_name.upper()))
+        else:
+            main_logger.error("Failed run Step {}: {}"
+                              .format(option, step_name.upper()))
+            os.kill(os.getpid(), signal.SIGILL)
+            return False
+
+    except Exception as e:
+        main_logger.error("Failed run Step {}: {}"
+                          .format(option, step_name.upper()))
+        main_logger.error("Error: {}".format(Exception))
+        os.kill(os.getpid(), signal.SIGILL)
         return False

@@ -10,13 +10,14 @@ import errorhandler
 import iac_init.validator
 
 from . import options
-from loguru import logger
 from iac_init.conf import settings
 from iac_init.yaml_conf import yaml_writer
+from iac_init.scripts.log_tool import log_tool
 from iac_init.scripts.thread_tool import MyThread
 from iac_init.scripts.ansible_tool import ansible_deploy_function
 
 error_handler = errorhandler.ErrorHandler()
+logger = log_tool()
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
@@ -30,16 +31,6 @@ def main(
 
     if os.path.exists(output) and os.path.isdir(output):
         shutil.rmtree(output)
-
-    logger.add(
-        sink=os.path.join(
-            settings.OUTPUT_BASE_DIR,
-            'iac_init_log',
-            'iac_init_main.log'
-        ),
-        format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}',
-        encoding='utf-8'
-    )
 
     validator = iac_init.validator.Validator(data, output)
 

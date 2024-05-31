@@ -2,23 +2,12 @@
 
 # Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
 
-import requests
-import os
 import json
 import urllib3
-from loguru import logger
-from iac_init.conf import settings
+import requests
+from iac_init.scripts.log_tool import log_tool
 
-# Rudy: need to check log setting
-logger.add(
-    sink=os.path.join(
-        settings.OUTPUT_BASE_DIR,
-        'iac_init_log',
-        'iac_init_main.log'
-    ),
-    format="{time} {level} {message}",
-    level="INFO"
-)
+logger = log_tool()
 
 urllib3.disable_warnings(
     urllib3.exceptions.InsecureRequestWarning

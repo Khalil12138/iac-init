@@ -5,22 +5,19 @@
 import os
 import re
 import time
+import yaml as pyyaml
 from ruamel import yaml
-
-from loguru import logger
 from typing import Any, Dict, List, Optional
 
 from iac_init.conf import settings
+from iac_init.scripts.log_tool import log_tool
 from iac_init.yaml_conf.yaml import load_yaml_files
 from iac_init.scripts.ssh_tool import check_ssh_connection
 from iac_init.scripts.apic_connecton_tool import apic_login
 from iac_init.scripts.cimc_precheck_tool import cimc_precheck
 from iac_init.scripts.telnet_tool import TelnetClient
 
-logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR,
-           'iac_init_log', 'iac_init_main.log'),
-           format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}',
-           encoding='utf-8')
+logger = log_tool()
 
 
 class Validator:
@@ -33,7 +30,7 @@ class Validator:
         self._wrapped = self._validate_path
 
     def _validate_path(self):
-        '''Validate if user provided YAML directory exists'''
+        # Validate if user provided YAML directory exists
         if os.path.exists(self.data_path):
             if os.path.isdir(self.data_path):
                 pass
@@ -64,7 +61,7 @@ class Validator:
             # YAML syntax validation
             try:
                 load_yaml_files([file_path])
-            except yaml.error.MarkedYAMLError as e:
+            except pyyaml.error.MarkedYAMLError as e:
                 line = 0
                 column = 0
                 if e.problem_mark is not None:

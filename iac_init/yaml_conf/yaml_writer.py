@@ -8,18 +8,11 @@ import pathlib
 import shutil
 
 from . import yaml
-from loguru import logger
 from typing import Any, Dict, List
+from iac_init.scripts.log_tool import log_tool
 from jinja2 import ChainableUndefined, Environment, FileSystemLoader
-from iac_init.conf import settings
 
-# Rudy: need to check log setting
-logger.add(
-    sink=os.path.join(
-        settings.OUTPUT_BASE_DIR,
-        'iac_init_log',
-        'iac_init_main.log'),
-    format="{time} {level} {message}", level="INFO")
+logger = log_tool()
 
 
 class YamlWriter:
