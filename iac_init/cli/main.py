@@ -324,6 +324,7 @@ def main(
                     quiet=False)
 
                 if not validate_result:
+                    logger.error("NaC validated failed!")
                     exit()
 
                 deploy_result = ansible_deploy_function(
@@ -335,6 +336,7 @@ def main(
                 )
 
                 if not deploy_result:
+                    logger.error("NaC deployed failed!")
                     exit()
 
                 test_result = ansible_deploy_function(
@@ -346,6 +348,7 @@ def main(
                 )
 
                 if not test_result:
+                    logger.error("NaC tested failed!")
                     exit()
 
             except Exception as e:
