@@ -28,11 +28,12 @@ class TelnetClient:
         try:
             self.tn.open(self.host_ip, self.port)
 
-        except:
+        except Exception as e:
             logger.error(
                 '{}:{} connected failed!'
                 .format(self.host_ip, self.port)
             )
+            logger.error(f"Exception details:\n {e}")
             self.tn.close()
             return False
 

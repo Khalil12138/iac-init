@@ -402,6 +402,7 @@ class Validator:
                 y.dump(self.data, fh)
             return True
 
-        except:
+        except Exception as e:
             logger.error("Cannot write file: {}".format(path))
+            logger.error(f"Exception details:\n {e}")
             return False

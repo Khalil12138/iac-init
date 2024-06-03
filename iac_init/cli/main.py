@@ -61,7 +61,7 @@ def main(
 
     error = validator._wrapped()
     if error:
-        logger.error(f"Option(s): {option_choice} validated failed, exiting...")
+        logger.error(f"Option(s): {option_choice} validated failed, exiting..")
         exit()
     logger.info("Option(s) validated.")
     logger.info(f"Option(s): {option_choice} had been selected!")
@@ -83,8 +83,10 @@ def main(
             try:
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option) - 1], output)
-                logger.info("Generate step {} working directory in {} successfully."
-                            .format(option, output))
+                # logger.info("Generate step {} working directory in {} successfully."
+                #             .format(option, output))
+                logger.info(f"Generate step {option} working directory" \
+                            f"in {output} successfully")
 
                 dir_path = os.path.join(
                     output,
@@ -111,7 +113,7 @@ def main(
                                 .format(yaml_cp_output_path))
 
             except Exception as e:
-                msg = "Generate working directory failed.\nDetail: {}".format(e)
+                msg = f"Generate working directory failed.\nDetail: {e}"
                 logger.error(msg)
                 exit()
 
@@ -206,7 +208,7 @@ def main(
                     )
 
             except Exception as e:
-                msg = "Generate working directory failed.\nDetail: {}".format(e)
+                msg = f"Generate working directory failed.\nDetail: {e}"
                 logger.error(msg)
                 exit()
 
