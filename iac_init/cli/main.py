@@ -10,11 +10,11 @@ import errorhandler
 import iac_init.validator
 
 from . import options
-from loguru import logger
 from iac_init.conf import settings
 from iac_init.yaml_conf import yaml_writer
 from iac_init.scripts.thread_tool import MyThread
 from iac_init.scripts.ansible_tool import ansible_deploy_function
+from iac_init.scripts.logging_tool import setup_logging
 
 error_handler = errorhandler.ErrorHandler()
 
@@ -31,15 +31,7 @@ def main(
     if os.path.exists(output) and os.path.isdir(output):
         shutil.rmtree(output)
 
-    logger.add(
-        sink=os.path.join(
-            settings.OUTPUT_BASE_DIR,
-            'iac_init_log',
-            'iac_init_main.log'
-        ),
-        format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}',
-        encoding='utf-8'
-    )
+    logger = setup_logging()
 
     validator = iac_init.validator.Validator(data, output)
 
@@ -85,11 +77,11 @@ def main(
             if error:
                 exit()
             # Rudy: If only 1, this might not need to check
-            option_yaml_path = validator.validate_yaml_exist(
-                settings.DATA_PATH[int(option)-1]
-            )
-            if not option_yaml_path:
-                exit()
+            # option_yaml_path = validator.validate_yaml_exist(
+            #     settings.DATA_PATH[int(option)-1]
+            # )
+            # if not option_yaml_path:
+            #     exit()
             try:
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option) - 1], output)
@@ -144,7 +136,7 @@ def main(
                     target=ansible_deploy_function,
                     args=(
                         playbook_dir_apic,
-                        settings.ANSIBLE_STEP[3],
+                        settings.ANSIBLE_STEP[0],
                         option,
                         None,
                         True)
@@ -153,7 +145,7 @@ def main(
                     target=ansible_deploy_function,
                     args=(
                         playbook_dir_switch,
-                        settings.ANSIBLE_STEP[4],
+                        settings.ANSIBLE_STEP[1],
                         option,
                         None,
                         True)
@@ -170,6 +162,7 @@ def main(
 
                 if thread1.get_result() and thread2.get_result():
                     logger.info("ACI fabric bootstrap is successfully.")
+                    logger.info("Processing step {} is completed.".format(option))
                 else:
                     logger.error(
                         "ACI fabric bootstrap failed, "
@@ -192,11 +185,11 @@ def main(
             error = validator.validate_cimc_precheck()
             if error:
                 exit()
-            option_yaml_path = validator.validate_yaml_exist(
-                settings.DATA_PATH[int(option)-1]
-            )
-            if not option_yaml_path:
-                exit()
+            # option_yaml_path = validator.validate_yaml_exist(
+            #     settings.DATA_PATH[int(option)-1]
+            # )
+            # if not option_yaml_path:
+            #     exit()
             try:
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option)-1], output)
@@ -234,12 +227,13 @@ def main(
 
                 run_result = ansible_deploy_function(
                     playbook_dir=playbook_dir,
-                    step_name=settings.ANSIBLE_STEP[5],
+                    step_name=settings.ANSIBLE_STEP[2],
                     option=option,
                     quiet=False
                 )
                 if run_result:
                     logger.info("APIC init successfully.")
+                    logger.info("Processing step {} is completed.".format(option))
                 else:
                     logger.error("APIC init failed!")
                     exit()
@@ -260,7 +254,7 @@ def main(
             if not yaml_path:
                 exit()
             option_yaml_path = validator.validate_yaml_dir_exist(
-                settings.DATA_PATH[int(option)-1]
+                settings.DATA_PATH
             )
             if not option_yaml_path:
                 exit()
@@ -331,7 +325,7 @@ def main(
 
                 validate_result = ansible_deploy_function(
                     playbook_dir=playbook_dir_validate,
-                    step_name=settings.ANSIBLE_STEP[0],
+                    step_name=settings.ANSIBLE_STEP[3],
                     inventory_path=inventory_path,
                     option=option,
                     quiet=False)
@@ -341,7 +335,7 @@ def main(
 
                 deploy_result = ansible_deploy_function(
                     playbook_dir=playbook_dir_deploy,
-                    step_name=settings.ANSIBLE_STEP[1],
+                    step_name=settings.ANSIBLE_STEP[4],
                     inventory_path=inventory_path,
                     option=option,
                     quiet=False
@@ -352,7 +346,7 @@ def main(
 
                 test_result = ansible_deploy_function(
                     playbook_dir=playbook_dir_test,
-                    step_name=settings.ANSIBLE_STEP[2],
+                    step_name=settings.ANSIBLE_STEP[5],
                     inventory_path=inventory_path,
                     option=option,
                     quiet=False
@@ -366,6 +360,8 @@ def main(
                       " failed.\nDetail: {}".format(e)
                 logger.error(msg)
                 exit()
+            
+            logger.info("Processing step {} is completed.".format(option))
 
 
 def exit() -> None:

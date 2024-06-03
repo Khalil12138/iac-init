@@ -17,12 +17,13 @@ DEFAULT_USER_OPTIONS = [
 
 
 DEFAULT_DATA_PATH = "00-global_policy.yml"
+DATA_PATH = "nac_data"
 
-DATA_PATH = [
-    "00-global_policy.yml",
-    "00-global_policy.yml",
-    "nac_data",
-]
+# DATA_PATH = [
+#     "00-global_policy.yml",
+#     "00-global_policy.yml",
+#     "nac_data",
+# ]
 
 TEMPLATE_DIR = [
     os.path.join(BASE_DIR, "templates", "01-wipe_aci_fabric"),
@@ -39,12 +40,12 @@ OUTPUT_DIR = [
 os.environ["iac_init_option_1"] = OUTPUT_DIR[0]
 os.environ["iac_init_option_2"] = OUTPUT_DIR[1]
 
-# Rudy: sync the step name later
+
 ANSIBLE_STEP = [
-    'iac-validate',
-    'deploy',
-    'iac-test',
     'wipe_apic',
     'wipe_switch',
-    'apic_setup'
+    'setup_apic',
+    'aac_validate',
+    'aac_deploy',
+    'aac_test'
 ]

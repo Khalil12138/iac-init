@@ -7,7 +7,6 @@ import re
 import time
 from ruamel import yaml
 
-from loguru import logger
 from typing import Any, Dict, List, Optional
 
 from iac_init.conf import settings
@@ -16,11 +15,9 @@ from iac_init.scripts.ssh_tool import check_ssh_connection
 from iac_init.scripts.apic_connecton_tool import apic_login
 from iac_init.scripts.cimc_precheck_tool import cimc_precheck
 from iac_init.scripts.telnet_tool import TelnetClient
+from iac_init.scripts.logging_tool import setup_logging
 
-logger.add(sink=os.path.join(settings.OUTPUT_BASE_DIR,
-           'iac_init_log', 'iac_init_main.log'),
-           format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}',
-           encoding='utf-8')
+logger = setup_logging()
 
 
 class Validator:

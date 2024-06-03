@@ -5,19 +5,12 @@
 import os
 import time
 import telnetlib
-from loguru import logger
-from iac_init.conf import settings
 
-# Rudy: need to check log setting
-logger.add(
-    sink=os.path.join(
-        settings.OUTPUT_BASE_DIR,
-        'iac_init_log',
-        'iac_init_main.log'
-    ),
-    format="{time} {level} {message}",
-    level="INFO"
-)
+from iac_init.conf import settings
+from iac_init.scripts.logging_tool import setup_logging
+
+
+logger = setup_logging()
 
 
 class TelnetClient:
