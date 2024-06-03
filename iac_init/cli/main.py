@@ -96,7 +96,7 @@ def main(
                 )
                 if os.path.exists(dir_path) and os.path.isdir(dir_path):
                     yaml_cp_output_path = os.path.join(dir_path, 'main.yml')
-                    shutil.copy(option_yaml_path, yaml_cp_output_path)
+                    shutil.copy(yaml_path, yaml_cp_output_path)
                     logger.info("Copied switch YAML file to {} successfully."
                                 .format(yaml_cp_output_path))
 
@@ -108,7 +108,7 @@ def main(
                 )
                 if os.path.exists(dir_path) and os.path.isdir(dir_path):
                     yaml_cp_output_path = os.path.join(dir_path, 'main.yml')
-                    shutil.copy(option_yaml_path, yaml_cp_output_path)
+                    shutil.copy(yaml_path, yaml_cp_output_path)
                     logger.info("Copied APIC YAML file to {} successfully."
                                 .format(yaml_cp_output_path))
 
@@ -206,7 +206,7 @@ def main(
                 )
                 if os.path.exists(dir_path) and os.path.isdir(dir_path):
                     yaml_cp_output_path = os.path.join(dir_path, 'main.yml')
-                    shutil.copy(option_yaml_path, yaml_cp_output_path)
+                    shutil.copy(yaml_path, yaml_cp_output_path)
                     logger.info(
                         "Copied APIC YAML file to {} successfully."
                         .format(yaml_cp_output_path)
