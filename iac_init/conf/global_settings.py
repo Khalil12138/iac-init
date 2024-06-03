@@ -19,12 +19,6 @@ DEFAULT_USER_OPTIONS = [
 DEFAULT_DATA_PATH = "00-global_policy.yml"
 DATA_PATH = "nac_data"
 
-# DATA_PATH = [
-#     "00-global_policy.yml",
-#     "00-global_policy.yml",
-#     "nac_data",
-# ]
-
 TEMPLATE_DIR = [
     os.path.join(BASE_DIR, "templates", "01-wipe_aci_fabric"),
     os.path.join(BASE_DIR, "templates", "02-discover_apic"),

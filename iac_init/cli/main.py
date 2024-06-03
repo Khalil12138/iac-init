@@ -33,6 +33,8 @@ def main(
 
     logger = setup_logging()
 
+    logger.info("Start to process aac-init tool!")
+
     validator = iac_init.validator.Validator(data, output)
 
     # Type single number or multiple numbers (1,2...)
@@ -58,9 +60,10 @@ def main(
 
     error = validator._wrapped()
     if error:
-        logger.error("Option(s) validated failed, exiting...")
+        logger.error(f"Option(s): {option_choice} validated failed, exiting...")
         exit()
     logger.info("Option(s) validated.")
+    logger.info(f"Option(s): {option_choice} had been selected!")
 
     for option in option_choice:
         logger.info("Start processing step {}.".format(option))
@@ -76,12 +79,6 @@ def main(
             error = validator.validate_cimc_precheck()
             if error:
                 exit()
-            # Rudy: If only 1, this might not need to check
-            # option_yaml_path = validator.validate_yaml_exist(
-            #     settings.DATA_PATH[int(option)-1]
-            # )
-            # if not option_yaml_path:
-            #     exit()
             try:
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option) - 1], output)
@@ -162,7 +159,7 @@ def main(
 
                 if thread1.get_result() and thread2.get_result():
                     logger.info("ACI fabric bootstrap is successfully.")
-                    logger.info("Processing step {} is completed.".format(option))
+                    logger.info("Processing step {} completed.".format(option))
                 else:
                     logger.error(
                         "ACI fabric bootstrap failed, "
@@ -185,11 +182,6 @@ def main(
             error = validator.validate_cimc_precheck()
             if error:
                 exit()
-            # option_yaml_path = validator.validate_yaml_exist(
-            #     settings.DATA_PATH[int(option)-1]
-            # )
-            # if not option_yaml_path:
-            #     exit()
             try:
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option)-1], output)
@@ -232,14 +224,14 @@ def main(
                     quiet=False
                 )
                 if run_result:
-                    logger.info("APIC init successfully.")
-                    logger.info("Processing step {} is completed.".format(option))
+                    logger.info("APIC setup successfully.")
+                    logger.info("Processing step {} completed.".format(option))
                 else:
-                    logger.error("APIC init failed!")
+                    logger.error("APIC setup failed!")
                     exit()
 
             except Exception as e:
-                msg = "Run Step 2 APIC init ansible-playbook" \
+                msg = "Run Step 2 APIC setup ansible-playbook" \
                       " failed.\nDetail: {}".format(e)
                 logger.error(msg)
                 exit()
@@ -361,8 +353,10 @@ def main(
                 logger.error(msg)
                 exit()
             
-            logger.info("Processing step {} is completed.".format(option))
+            logger.info("Processing step {} completed.".format(option))
 
+
+    logger.info(f"Option(s): {option_choice} had been completed!")
 
 def exit() -> None:
     if error_handler.fired:

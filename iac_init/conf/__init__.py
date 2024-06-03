@@ -5,9 +5,6 @@
 from iac_init.conf import global_settings
 from iac_init.utils.functional import LazyObject, empty
 
-# ENVIRONMENT_VARIABLE = "IAC_INIT_SETTINGS_MODULE"
-
-
 class SettingsReference(str):
     """
     String subclass which references a current settings value. It's treated as

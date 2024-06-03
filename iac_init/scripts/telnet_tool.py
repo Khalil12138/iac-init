@@ -9,7 +9,6 @@ import telnetlib
 from iac_init.conf import settings
 from iac_init.scripts.logging_tool import setup_logging
 
-
 logger = setup_logging()
 
 

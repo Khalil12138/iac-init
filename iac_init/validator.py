@@ -317,8 +317,6 @@ class Validator:
         self.options = value
         return self.choices
 
-    # This function is used for option 1 and 2.
-    # Rudy: seems this is used for all options
     def validate_yaml_exist(self, yamlfile):
         for dir, _, files in os.walk(self.data_path):
             for filename in files:

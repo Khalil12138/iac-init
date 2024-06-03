@@ -1,9 +1,10 @@
-import os
+# -*- coding: utf-8 -*-
 
+# Copyright: (c) 2024, Rudy Lei <shlei@cisco.com>
+
+import os
 from loguru import logger
 from iac_init.conf import settings
-
-# logging tool
 
 def setup_logging():
     logger.add(
