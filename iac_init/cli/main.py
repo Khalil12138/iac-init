@@ -83,9 +83,7 @@ def main(
             try:
                 writer = yaml_writer.YamlWriter([yaml_path])
                 writer.write(settings.TEMPLATE_DIR[int(option) - 1], output)
-                # logger.info("Generate step {} working directory in {} successfully."
-                #             .format(option, output))
-                logger.info(f"Generate step {option} working directory" \
+                logger.info(f"Generate step {option} working directory"
                             f"in {output} successfully")
 
                 dir_path = os.path.join(

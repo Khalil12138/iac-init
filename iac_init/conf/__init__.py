@@ -31,7 +31,6 @@ class LazySettings(LazyObject):
             self._setup(name)
             _wrapped = self._wrapped
         # val = getattr(self._wrapped, name)
-        # add fix: ./iac_init/conf/__init__.py:31:13: F841 local variable '_wrapped' is assigned to but never used
         val = getattr(_wrapped, name)
         self.__dict__[name] = val
         return val
