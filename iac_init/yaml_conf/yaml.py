@@ -8,7 +8,6 @@ import importlib.util
 from typing import Any, Dict, List
 
 from ruamel import yaml
-from iac_init.conf import settings
 from iac_init.scripts.logging_tool import setup_logging
 
 logger = setup_logging()

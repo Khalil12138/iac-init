@@ -3,10 +3,8 @@
 # Copyright: (c) 2024, Wang Xiao <xiawang3@cisco.com>
 
 import requests
-import os
 import json
 import urllib3
-from iac_init.conf import settings
 from iac_init.scripts.logging_tool import setup_logging
 
 logger = setup_logging()
@@ -49,6 +47,7 @@ def get_health_status(APIC_IP, token):
         msg = "{}".format(e)
         logger.error(msg)
         return False
+
 
 # Rudy: discuss AAA domain later
 def apic_login(APIC_IP, APIC_USERNAME, APIC_PASSWORD):

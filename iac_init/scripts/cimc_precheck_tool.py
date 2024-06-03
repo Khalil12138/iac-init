@@ -2,13 +2,11 @@
 
 # Copyright: (c) 2024, Rudy Lei <shlei@cisco.com>
 
-import os
 import re
 import urllib3
 import requests
 import xml.etree.ElementTree as ET
 
-from iac_init.conf import settings
 from iac_init.scripts.logging_tool import setup_logging
 
 logger = setup_logging()

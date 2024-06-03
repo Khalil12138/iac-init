@@ -10,10 +10,10 @@ import shutil
 from . import yaml
 from typing import Any, Dict, List
 from jinja2 import ChainableUndefined, Environment, FileSystemLoader
-from iac_init.conf import settings
 from iac_init.scripts.logging_tool import setup_logging
 
 logger = setup_logging()
+
 
 class YamlWriter:
     def __init__(

@@ -49,7 +49,8 @@ def main(
         exit()
 
     # Type "yes" or "no" to confirm
-    option_prompt = "\nAre you sure to proceed with following option(s)?\n{}\n"\
+    option_prompt = "\nAre you sure to proceed with following option(s)?" \
+                    "\n{}\n" \
         .format("\n".join([f"[{i}]  {settings.DEFAULT_USER_OPTIONS[int(i)-1]}"
                            for i in option_choice]))
     option_proceed = click.prompt(
@@ -352,11 +353,11 @@ def main(
                       " failed.\nDetail: {}".format(e)
                 logger.error(msg)
                 exit()
-            
+
             logger.info("Processing step {} completed.".format(option))
 
-
     logger.info(f"Option(s): {option_choice} had been completed!")
+
 
 def exit() -> None:
     if error_handler.fired:
