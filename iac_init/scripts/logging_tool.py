@@ -1,5 +1,7 @@
-from loguru import logger
 import os
+
+from loguru import logger
+from iac_init.conf import settings
 
 def setup_logging():
     logger.add(
