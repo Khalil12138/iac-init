@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "iac-init"
-version = "0.9.4"
+version = "0.9.5"
 description = ""
 authors = ["Wang Xiao <xiawang3@cisco.com>", "Rudy Lei <shlei@cisco.com>"]
 readme = "README.md"
